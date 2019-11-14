@@ -1,0 +1,20 @@
+program <line: 4, col: 1> decl void
+  declaration <line: 6, col: 1>
+    variable <line: 6, col: 5> a1 integer
+    variable <line: 6, col: 9> a2 integer
+  declaration <line: 7, col: 1>
+    variable <line: 7, col: 5> b1 boolean
+  declaration <line: 8, col: 1>
+    variable <line: 8, col: 5> c1 real
+  declaration <line: 9, col: 1>
+    variable <line: 9, col: 5> d1 string
+  declaration <line: 10, col: 1>
+    variable <line: 10, col: 5> b1 integer
+      constant <line: 10, col: 10> 10
+  function declaration <line: 12, col: 1> func void ()
+    compound statement <line: 13, col: 1>
+  compound statement <line: 17, col: 1>
+
+|--------------------------------|
+|  There is no syntactic error!  |
+|--------------------------------|

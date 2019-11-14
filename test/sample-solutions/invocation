@@ -1,0 +1,24 @@
+program <line: 4, col: 1> invocation void
+  function declaration <line: 6, col: 1> call integer (integer, integer)
+    declaration <line: 6, col: 6>
+      variable <line: 6, col: 6> a integer
+      variable <line: 6, col: 9> b integer
+    compound statement <line: 7, col: 1>
+      if statement <line: 8, col: 3>
+        binary operator <line: 8, col: 8> <
+          variable reference <line: 8, col: 6> a
+          variable reference <line: 8, col: 10> b
+        return statement <line: 9, col: 5>
+          constant <line: 9, col: 12> 55146
+      else
+        return statement <line: 11, col: 5>
+          constant <line: 11, col: 12> 22146
+  compound statement <line: 16, col: 1>
+    function call statement <line: 17, col: 3> call
+      constant <line: 17, col: 8> 20
+      constant <line: 17, col: 12> 30
+    function call statement <line: 18, col: 3> call
+
+|--------------------------------|
+|  There is no syntactic error!  |
+|--------------------------------|

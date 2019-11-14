@@ -1,0 +1,11 @@
+program <line: 4, col: 1> variable void
+  declaration <line: 7, col: 1>
+    variable <line: 7, col: 5> s1 integer
+    variable <line: 7, col: 9> s2 integer
+  declaration <line: 10, col: 1>
+    variable <line: 10, col: 5> a1 real[2...5][3...5][400...401]
+  compound statement <line: 12, col: 1>
+
+|--------------------------------|
+|  There is no syntactic error!  |
+|--------------------------------|

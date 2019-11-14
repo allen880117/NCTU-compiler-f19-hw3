@@ -1,0 +1,24 @@
+program <line: 4, col: 1> ConstantValue void
+  declaration <line: 6, col: 1>
+    variable <line: 6, col: 5> ci integer
+      constant <line: 6, col: 10> 10
+  declaration <line: 7, col: 1>
+    variable <line: 7, col: 5> cs string
+      constant <line: 7, col: 10> "muda muda muda muda!!!"
+  declaration <line: 8, col: 1>
+    variable <line: 8, col: 5> cb boolean
+      constant <line: 8, col: 10> true
+  declaration <line: 9, col: 1>
+    variable <line: 9, col: 5> cr real
+      constant <line: 9, col: 10> 2.560000
+  declaration <line: 10, col: 1>
+    variable <line: 10, col: 5> cn real
+      constant <line: 10, col: 10> 11.111100
+  declaration <line: 11, col: 1>
+    variable <line: 11, col: 5> co integer
+      constant <line: 11, col: 10> 511
+  compound statement <line: 13, col: 1>
+
+|--------------------------------|
+|  There is no syntactic error!  |
+|--------------------------------|

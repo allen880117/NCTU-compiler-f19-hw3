@@ -1,0 +1,61 @@
+program <line: 4, col: 1> expression void
+  compound statement <line: 8, col: 1>
+    print statement <line: 9, col: 5>
+      unary operator <line: 9, col: 11> neg
+        constant <line: 9, col: 12> 1
+    print statement <line: 10, col: 5>
+      binary operator <line: 10, col: 13> *
+        constant <line: 10, col: 11> 1
+        constant <line: 10, col: 15> 5
+    print statement <line: 11, col: 5>
+      binary operator <line: 11, col: 14> /
+        constant <line: 11, col: 11> 12
+        constant <line: 11, col: 16> 3
+    print statement <line: 12, col: 5>
+      binary operator <line: 12, col: 14> mod
+        constant <line: 12, col: 11> 17
+        constant <line: 12, col: 18> 9
+    print statement <line: 13, col: 5>
+      binary operator <line: 13, col: 14> +
+        unary operator <line: 13, col: 11> neg
+          constant <line: 13, col: 12> 1
+        constant <line: 13, col: 16> 8
+    print statement <line: 14, col: 5>
+      binary operator <line: 14, col: 14> -
+        constant <line: 14, col: 11> 15
+        constant <line: 14, col: 16> 15
+    print statement <line: 15, col: 5>
+      binary operator <line: 15, col: 14> <
+        constant <line: 15, col: 11> 10
+        constant <line: 15, col: 16> 4
+    print statement <line: 16, col: 5>
+      binary operator <line: 16, col: 14> <=
+        constant <line: 16, col: 11> 10
+        constant <line: 16, col: 17> 4
+    print statement <line: 17, col: 5>
+      binary operator <line: 17, col: 14> =
+        constant <line: 17, col: 11> 10
+        constant <line: 17, col: 16> 4
+    print statement <line: 18, col: 5>
+      binary operator <line: 18, col: 14> >=
+        constant <line: 18, col: 11> 10
+        constant <line: 18, col: 17> 4
+    print statement <line: 19, col: 5>
+      binary operator <line: 19, col: 14> <>
+        constant <line: 19, col: 11> 10
+        constant <line: 19, col: 17> 4
+    print statement <line: 20, col: 5>
+      unary operator <line: 20, col: 11> not
+        constant <line: 20, col: 15> true
+    print statement <line: 21, col: 5>
+      binary operator <line: 21, col: 14> and
+        constant <line: 21, col: 11> 10
+        constant <line: 21, col: 18> 0
+    print statement <line: 22, col: 5>
+      binary operator <line: 22, col: 13> or
+        constant <line: 22, col: 11> 1
+        constant <line: 22, col: 16> 0
+
+|--------------------------------|
+|  There is no syntactic error!  |
+|--------------------------------|

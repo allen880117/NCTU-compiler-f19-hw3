@@ -1,0 +1,56 @@
+program <line: 4, col: 1> control void
+  compound statement <line: 6, col: 1>
+    declaration <line: 7, col: 3>
+      variable <line: 7, col: 7> debug boolean
+    declaration <line: 8, col: 3>
+      variable <line: 8, col: 7> counter integer
+    if statement <line: 11, col: 3>
+      binary operator <line: 11, col: 9> >
+        constant <line: 11, col: 7> 1
+        constant <line: 11, col: 11> 0
+      print statement <line: 12, col: 5>
+        constant <line: 12, col: 11> true
+    else
+      print statement <line: 14, col: 5>
+        constant <line: 14, col: 11> false
+    if statement <line: 17, col: 3>
+      binary operator <line: 17, col: 12> =
+        variable reference <line: 17, col: 6> debug
+        constant <line: 17, col: 14> true
+      print statement <line: 18, col: 5>
+        constant <line: 18, col: 11> "[LOG]\n"
+    assignment statement <line: 22, col: 11>
+      variable reference <line: 22, col: 3> counter
+      constant <line: 22, col: 14> 0
+    while statement <line: 23, col: 3>
+      binary operator <line: 23, col: 17> <
+        variable reference <line: 23, col: 9> counter
+        constant <line: 23, col: 19> 10
+      print statement <line: 24, col: 5>
+        constant <line: 24, col: 11> "Taiwan No.1\n"
+    for statement <line: 28, col: 3>
+      declaration <line: 28, col: 7>
+        variable <line: 28, col: 7> idx integer
+      assignment statement <line: 28, col: 11>
+        variable reference <line: 28, col: 7> idx
+        constant <line: 28, col: 14> 0
+      constant <line: 28, col: 19> 10
+      compound statement <line: 29, col: 5>
+        declaration <line: 30, col: 7>
+          variable <line: 30, col: 11> idx integer
+            constant <line: 30, col: 16> 10
+        print statement <line: 31, col: 7>
+          constant <line: 31, col: 13> "ISA (Ideology State Automaton)\n"
+    for statement <line: 35, col: 3>
+      declaration <line: 35, col: 7>
+        variable <line: 35, col: 7> idx integer
+      assignment statement <line: 35, col: 11>
+        variable reference <line: 35, col: 7> idx
+        constant <line: 35, col: 14> 0
+      constant <line: 35, col: 19> 10
+    return statement <line: 38, col: 3>
+      constant <line: 38, col: 10> 11
+
+|--------------------------------|
+|  There is no syntactic error!  |
+|--------------------------------|
