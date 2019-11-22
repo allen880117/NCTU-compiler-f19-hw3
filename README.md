@@ -142,7 +142,9 @@ For a minimum modification, you should keep the member name unchanged; otherwise
 
 **2. Actions for Setting Locations**
 
-You should provide an action to set the location of each token by defining the macro `YY_USER_ACTION` in `lex`. It is always executed before the action of the matched token rule.
+Before providing action in your `lex` file, you have to put `%locations` in your `yacc` file, so that `bison` can generate the header with the extern variable `yylloc` for further usage.
+
+You should then provide an action to set the location of each token by defining the macro `YY_USER_ACTION` in `lex`. It is always executed before the action of the matched token rule.
 
 Here is the definition of the macro `YY_USER_ACTION`:
 
@@ -360,7 +362,7 @@ Be careful, you will get a **50-percent** deduction if you pass **any of** our t
 
 ### Build Project
 
-TA would use `src/Makefile` to build your project by simply typing `make clean && make`. You have to make sure that it will generate an executable named '`parser`'. **No further grading will be made if the `make` process fails or the executable '`parser`' is not found.**
+TA would use `src/Makefile` to build your project by simply typing `make clean && make` on CS workstation. You have to make sure that it will generate an executable named '`parser`'. **No further grading will be made if the `make` process fails or the executable '`parser`' is not found.**
 
 ### Test your parser
 

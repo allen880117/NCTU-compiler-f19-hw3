@@ -20,7 +20,7 @@ Your assignment is to perform semantic analyses for a `P` program. In the previo
 You first need to construct your symbol table, which should be able to perform the following tasks:
 
 - Push a symbol table when entering a scope and pop it when exiting the scope.
-- Insert entries for (constant) variables, functions, and program delcarations.
+- Insert entries for (constant) variables, functions, and program declarations.
 - Lookup entries in the symbol table.
 
 After that, you need to perform semantic analyses with the help of symbol tables by performing post-order traversal on the AST, following the semantic definitions described below.
@@ -206,6 +206,8 @@ The two program units are the *program* and the *function*.
 - In an array declaration, the index of the lower bound must be smaller than that of the upper bound. Both of the indices must be greater than or equal to zero.
 
 - Each index of array references must be an integer. Bound checking is not performed at compile time as in C language.
+
+- An over array subscript is not allowed, that is, the number of indices of an array reference cannot be greater than the number of dimensions in the declaration.
 
 ### Expression
 

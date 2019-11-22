@@ -16,22 +16,22 @@ The format of a semantic error:
 
 **Table of Contents**
 - [Abstract Syntactic Definitions](#abstract-syntactic-definitions)
-  - [Error Detection](#error-detection)
-	  - [Symbol Table](#symbol-table)
-	  - [Program Node](#program-node)
-	  - [Function Node](#function-node)
-	  - [Variable Node](#variable-node)
-	  - [Variable Reference Node](#variable-reference-node)
-	  - [Binary Operator Node](#binary-operator-node)
-	  - [Unary Operator Node](#unary-operator-node)
-	  - [Return Node](#return-node)
-	  - [Assignment Node](#assignment-node)
-	  - [Print Node](#print-node)
-	  - [Read Node](#read-node)
-	  - [If Node](#if-node)
-	  - [While Node](#while-node)
-	  - [For Node](#for-node)
-	  - [Function Call Node](#function-call-node)
+	- [Error Detection](#error-detection)
+		- [Symbol Table](#symbol-table)
+		- [Program Node](#program-node)
+		- [Function Node](#function-node)
+		- [Variable Node](#variable-node)
+		- [Variable Reference Node](#variable-reference-node)
+		- [Binary Operator Node](#binary-operator-node)
+		- [Unary Operator Node](#unary-operator-node)
+		- [Return Node](#return-node)
+		- [Assignment Node](#assignment-node)
+		- [Print Node](#print-node)
+		- [Read Node](#read-node)
+		- [If Node](#if-node)
+		- [While Node](#while-node)
+		- [For Node](#for-node)
+		- [Function Call Node](#function-call-node)
 
 ## Error Detection
 
@@ -107,6 +107,14 @@ The following describes what semantics should be checked in each node of the AST
 	           ^
 	```
 
+- An over array subscript is not allowed.
+
+	```
+	<Error> Found in line 10, column 13: there is an over array subscript
+	    return (b[1][4][1] >= 1.0);
+	            ^
+	```
+
 ### Binary Operator Node
 
 - Errors related to binary operation. (check out [Expression](./README.md#expression))
@@ -115,7 +123,6 @@ The following describes what semantics should be checked in each node of the AST
 	<Error> Found in line x, column y: invalid operands to binary operation '<op>' ('<left operand type>' and '<right operand type>')
 	    a := b + c;
 	           ^
-
 	```
 
 ### Unary Operator Node
@@ -190,8 +197,8 @@ The following describes what semantics should be checked in each node of the AST
 
 	```
 	<Error> Found in line x, column y: variable reference of print statements must be scalar type
-		print a[1];
-			  ^
+	    print a[1];
+	          ^
 	```
 
 ### Read Node
@@ -200,16 +207,16 @@ The following describes what semantics should be checked in each node of the AST
 
 	```
 	<Error> Found in line x, column y: variable reference of read statements must be scalar type
-		read a[1];
-			 ^
+	    read a[1];
+	         ^
 	```
 
 - Variable reference in the read statement cannot be a constant variable reference.
 
 	```
 	<Error> Found in line x, column y: variable reference of read statements cannot be a constant variable reference.
-		read c;
-			 ^
+	    read c;
+	         ^
 	```
 
 - The value of the loop variable cannot be changed inside the loop.
@@ -217,7 +224,7 @@ The following describes what semantics should be checked in each node of the AST
 	```
 	<Error> Found in line x, column y: the value of loop variable cannot be modified inside the loop
 	    read i;
-	    ^
+	         ^
 	```
 
 ### If Node and While Node
@@ -236,7 +243,7 @@ The following describes what semantics should be checked in each node of the AST
 
 	```
 	<Error> Found in line x, column y: the lower/upper bound of iteration count must be greater than or equal to zero
-		for idx := -1 to 10 do
+	    for idx := -1 to 10 do
 	    ^
 	<Error> Found in line x, column y: the lower bound of iteration count must be smaller than or equal to the upper bound
 	    for idx := 10 to 1 do
@@ -257,6 +264,6 @@ The following describes what semantics should be checked in each node of the AST
 
 	```
 	<Error> Found in line x, column y: too few/much arguments to function invocation
-        func1();
-        ^
+	    func1();
+	    ^
 	```
