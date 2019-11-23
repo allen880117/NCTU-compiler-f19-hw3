@@ -2,5 +2,6 @@
 #include <iostream>
 
 void Cat::make_sound() { std::cout << "Meow!" << std::endl; }
-
+Cat::Cat(int, char){;}
 void Dog::make_sound() { std::cout << "Woof!!" << std::endl; }
+Dog::Dog(int){;}

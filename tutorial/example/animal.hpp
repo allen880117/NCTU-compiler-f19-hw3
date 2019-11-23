@@ -17,6 +17,7 @@ public:
 class Cat : public Animal
 {
 public:
+  Cat(int, char);
   void accept(AnimalVisitorBase &v) { v.visit(this); }
   void make_sound();
 };
@@ -24,6 +25,7 @@ public:
 class Dog : public Animal
 {
 public:
+  Dog(int);
   /*virtual*/ void accept(AnimalVisitorBase &v) { v.visit(this); }
   void make_sound();
 };
