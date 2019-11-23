@@ -1,7 +1,7 @@
-CC      = gcc
+CC      = g++
 LEX     = flex
 YACC    = bison
-CFLAGS  = -Wall -std=c11
+CFLAGS  = -Wall -std=c++11
 LIBS    = -lfl -ly
 INCLUDE = -Iinclude
 
@@ -9,39 +9,39 @@ SCANNER = scanner
 PARSER  = parser
 
 ASTDIR = src/AST/
-AST := $(shell find $(ASTDIR) -name '*.c')
+AST := $(shell find $(ASTDIR) -name '*.cpp')
 
 VISITORDIR = src/visitor/
-VISITOR := $(shell find $(VISITORDIR) -name '*.c')
+VISITOR := $(shell find $(VISITORDIR) -name '*.cpp')
 
 SRC := $(AST) \
        $(VISITOR)
 
 EXEC = $(PARSER)
-OBJS = $(PARSER:=.c) \
-       $(SCANNER:=.c) \
+OBJS = $(PARSER:=.cpp) \
+       $(SCANNER:=.cpp) \
        $(SRC)
 
 # Substitution reference
-DEPS := $(OBJS:%.c=%.d)
-OBJS := $(OBJS:%.c=%.o)
+DEPS := $(OBJS:%.cpp=%.d)
+OBJS := $(OBJS:%.cpp=%.o)
 
 all: $(EXEC)
 
 # Static pattern rule
-$(SCANNER).c: %.c: %.l
+$(SCANNER).cpp: %.cpp: %.l
 	$(LEX) -o $@ $<
 
-$(PARSER).c: %.c: %.y
+$(PARSER).cpp: %.cpp: %.y
 	$(YACC) -o $@ --defines=parser.h -v $<
 
-%.o: %.c
+%.o: %.cpp
 	$(CC) -o $@ $(CFLAGS) $(INCLUDE) -c -MMD $<
 
 $(EXEC): $(OBJS)
 	$(CC) -o $@ $^ $(LIBS) $(INCLUDE)
 
 clean:
-	$(RM) $(DEPS) $(SCANNER:=.c) $(PARSER:=.c) $(OBJS) $(EXEC)
+	$(RM) $(DEPS) $(SCANNER:=.cpp) $(PARSER:=.cpp) $(OBJS) $(EXEC)
 
 -include $(DEPS)
