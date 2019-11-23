@@ -5,8 +5,8 @@
 #include <string>
 using namespace std;
 
-typedef vector< shared_ptr<class ASTNodeBase> > NodeList;
-typedef shared_ptr<class ASTNodeBase>           Node;
+typedef vector< class ASTNodeBase* > NodeList;
+typedef class ASTNodeBase*           Node;
 
 class ASTVisitorBase
 {
@@ -43,9 +43,9 @@ class ProgramNode : public ASTNodeBase
         int  line_number; // program name
         int  col_number;  // program name
         string program_name;
-        // string return_type;
-        NodeList declaration_node_list;
-        NodeList function_node_list;
+        string return_type;
+        NodeList* declaration_node_list;
+        NodeList* function_node_list;
         Node compound_statement_node;
         int  end_line_number; // program name after end
         int  end_col_number;  // program name after end
@@ -56,14 +56,16 @@ class ProgramNode : public ASTNodeBase
             int _line_number, 
             int _col_number, 
             string _program_name, 
-            NodeList _declaration_node_list, 
-            NodeList _function_node_list, 
-            Node _compound_statement_list, 
+            string _return_type,
+            NodeList* _declaration_node_list, 
+            NodeList* _function_node_list, 
+            Node _compound_statement_node, 
             int _end_line_number, 
             int _end_col_number, 
             string _end_name );
         void accept(ASTVisitorBase &v) {v.visit(this); }
         void print();
+        ~ProgramNode();
 };
 
 class DeclarationNode : public ASTNodeBase
@@ -71,12 +73,13 @@ class DeclarationNode : public ASTNodeBase
     private:
         int  line_number; // var
         int  col_number;  // var
-        NodeList variables_node_list; // Variables
+        NodeList* variables_node_list; // Variables
     
     public:
-        DeclarationNode(int, int, NodeList);
+        DeclarationNode(int, int, NodeList*);
         void accept(ASTVisitorBase &v) {v.visit(this); }
         void print();
+        ~DeclarationNode();
 };
 
 class VariableNode : public ASTNodeBase
@@ -92,6 +95,7 @@ class VariableNode : public ASTNodeBase
         VariableNode(int, int, string, string, Node);
         void accept(ASTVisitorBase &v) {v.visit(this); }
         void print();
+        ~VariableNode();
 };
 
 class ConstantValueNode : public ASTNodeBase
@@ -113,7 +117,7 @@ class FunctionNode : public ASTNodeBase
         int  line_number; // function name
         int  col_number;  // function name
         string function_name;
-        NodeList parameters; // a list of declaration nodes
+        NodeList* parameters; // a list of declaration nodes
         string return_type;
         Node body; // a compound statement node
         int  end_line_number; // function name after end
@@ -121,7 +125,7 @@ class FunctionNode : public ASTNodeBase
         string end_name;
     
     public:
-        FunctionNode(int, int, string, NodeList, string, Node, int, int, string);
+        FunctionNode(int, int, string, NodeList*, string, Node, int, int, string);
         void accept(ASTVisitorBase &v) {v.visit(this); }
         void print();
 };
@@ -131,11 +135,15 @@ class CompoundStatementNode : public ASTNodeBase
     private:
         int  line_number; // begin
         int  col_number;  // begin
-        NodeList declaration_node_list; // Local variable and constant declarations
-        NodeList statement_node_list; // Statements
+        NodeList* declaration_node_list; // Local variable and constant declarations
+        NodeList* statement_node_list; // Statements
 
     public:
-        CompoundStatementNode(int, int, NodeList, NodeList);
+        CompoundStatementNode(
+            int _line_number, 
+            int _col_number, 
+            NodeList* _declaration_node_list, 
+            NodeList* _statement_node_list);
         void accept(ASTVisitorBase &v) {v.visit(this); }
         void print();
 };
@@ -186,10 +194,10 @@ class VariableReferenceNode : public ASTNodeBase
         int  line_number; // variable name
         int  col_number;  // varibble name
         string variable_name;
-        NodeList expression_node_list; // indices
+        NodeList* expression_node_list; // indices
 
     public:
-        VariableReferenceNode(int, int, string, NodeList);
+        VariableReferenceNode(int, int, string, NodeList*);
         void accept(ASTVisitorBase &v) {v.visit(this); }
         void print();
 };
@@ -229,11 +237,11 @@ class IfNode : public ASTNodeBase
         int  line_number; // if
         int  col_number;  // if
         Node condition; // an expression node
-        NodeList body; // a list of statement nodes
-        NodeList body_of_else; // a list of statement nodes
+        NodeList* body; // a list of statement nodes
+        NodeList* body_of_else; // a list of statement nodes
 
     public:
-        IfNode(int, int, Node, NodeList, NodeList);
+        IfNode(int, int, Node, NodeList*, NodeList*);
         void accept(ASTVisitorBase &v) {v.visit(this); }
         void print();
 };
@@ -244,10 +252,10 @@ class WhileNode : public ASTNodeBase
         int  line_number; // while
         int  col_number;  // while
         Node condition; // an expression node
-        NodeList body; // a list of statement nodes
+        NodeList* body; // a list of statement nodes
 
     public:
-        WhileNode(int, int, Node, NodeList);
+        WhileNode(int, int, Node, NodeList*);
         void accept(ASTVisitorBase &v) {v.visit(this); }
         void print();
 };
@@ -260,10 +268,10 @@ class ForNode : public ASTNodeBase
         Node loop_variable_declaration; // an declaration node
         Node initial_statement; // an assignment node
         Node condition; // an expression node
-        NodeList body; // a list of statement nodes
+        NodeList* body; // a list of statement nodes
 
     public:
-        ForNode(int, int, Node, Node, Node, NodeList);
+        ForNode(int, int, Node, Node, Node, NodeList*);
         void accept(ASTVisitorBase &v) {v.visit(this); }
         void print();
 };
@@ -287,10 +295,10 @@ class FunctionCallNode : public ASTNodeBase
         int  line_number; // function name
         int  col_number;  // function name
         string function_name;
-        NodeList arguments; // a list of expression nodes
+        NodeList* arguments; // a list of expression nodes
 
     public:
-        FunctionCallNode(int, int, string, NodeList);
+        FunctionCallNode(int, int, string, NodeList*);
         void accept(ASTVisitorBase &v) {v.visit(this); }
         void print();
 };

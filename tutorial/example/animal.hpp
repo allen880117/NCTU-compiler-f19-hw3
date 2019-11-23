@@ -28,4 +28,5 @@ public:
   Dog(int);
   /*virtual*/ void accept(AnimalVisitorBase &v) { v.visit(this); }
   void make_sound();
+  void quake();
 };

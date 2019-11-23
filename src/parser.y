@@ -11,9 +11,6 @@
 
 using namespace std;
 
-typedef vector< shared_ptr<ASTNodeBase> > NodeList;
-typedef shared_ptr<ASTNodeBase>           Node;
-
 #define YYLTYPE yyltype
 
 typedef struct YYLTYPE {
@@ -34,14 +31,24 @@ extern char *yytext;
 extern int yylex(void);
 static void yyerror(const char *msg);
 
-NodeList AST;
+/* Datatype for Return Non-terminals */
+
+static Node AST;
+
 %}
 
+    /* Useful Header */
+%code requires { #include "include/AST/program.hpp" }
+
+    /* Union Define */
 %union {
     int   value;
     char* text;
-    int   optype;
-    int   nodetype;
+
+    int   op_type;
+
+    NodeList* node_list_ptr;
+    Node      node;
 }
 
 %locations
@@ -77,8 +84,16 @@ NodeList AST;
 %token REAL_LITERAL
 %token STRING_LITERAL
 
-    /* Nonterminals */
+    /* Type of Nonterminals */
 %type <text> ProgramName
+
+%type <node> Declaration
+%type <node_list_ptr> Declarations
+%type <node_list_ptr> DeclarationList
+
+%type <node_list_ptr> FunctionList
+
+%type <node> CompoundStatement
 
 %%
     /*
@@ -86,43 +101,75 @@ NodeList AST;
                      */
 
 Program:
-    ProgramName SEMICOLON ProgramBody END ProgramName {
-        AST.push_back(make_shared<ProgramNode>(
+    ProgramName SEMICOLON DeclarationList FunctionList CompoundStatement END ProgramName {
+        // Program Node        
+        string return_type = "void";
+        ProgramNode* program_node = new ProgramNode(
             @1.first_line,
             @1.first_column,
             $1,
-            NULL,
-            NULL,
-            NULL,
-            @5.first_line,
-            @5.first_column,
-            $5
-        ));
+            return_type,
+            $3,
+            $4,
+            $5,
+            @7.first_line,
+            @7.first_column,
+            $7
+        );
+        printf("HELLOWORLD\n");
+        AST = program_node;
     }
 ;
 
 ProgramName:
-    ID
+    ID{
+        $$ = $1;
+    }
 ;
 
-ProgramBody:
-    DeclarationList FunctionList CompoundStatement
-;
+    /*
+    ProgramBody:
+        DeclarationList FunctionList CompoundStatement {
+            printf("HELLOWORLD\n");
+            $$->_declaration_node_list = *$1; // *(NodeList*)
+            $$->_function_node_list = *$2; // *(NodeList*)
+            $$->_compound_statement_node = $3; // Node
+        }
+    ;
+    */
 
 DeclarationList:
-    Epsilon
+    Epsilon {
+        // $$ = NodeList*
+        //$$ = nullptr;
+    }
     |
-    Declarations
+    Declarations {
+        // $$ = NodeList*
+        // $1 = NodeList*
+        $$ = $1;
+    }
 ;
 
 Declarations:
-    Declaration
+    Declaration{
+        // $$ = NodeList*
+        // $1 = Node
+        $$->push_back($1);
+    }
     |
-    Declarations Declaration
+    Declarations Declaration{
+        // $$ = NodeList*
+        // $1 = NodeList*
+        // $2 = Node
+        $1->push_back($2);
+        $$ = $1;
+    }
 ;
 
 FunctionList:
-    Epsilon
+    Epsilon{
+    }
     |
     Functions
 ;
@@ -177,6 +224,7 @@ ReturnType:
 
 Declaration:
     VAR IdList COLON TypeOrConstant SEMICOLON{
+        // Variable Node
     }
 ;
 
@@ -248,7 +296,14 @@ CompoundStatement:
     BEGIN_
     DeclarationList
     StatementList
-    END
+    END {
+        CompoundStatementNode(
+            @1.first_line, 
+            @1.first_column, 
+            nullptr,
+            nullptr
+        );
+    }
 ;
 
 Simple:
@@ -403,7 +458,6 @@ int main(int argc, const char *argv[]) {
     yyin = fp;
     yyparse();
 
-    //freeProgramNode(root);
 
     printf("\n"
            "|--------------------------------|\n"
