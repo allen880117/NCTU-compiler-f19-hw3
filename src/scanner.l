@@ -85,7 +85,7 @@ float {integer}\.(0|[0-9]*[1-9])
 "while"   { TOKEN(KWwhile);   return WHILE; }
 
     /* Identifier */
-[a-zA-Z][a-zA-Z0-9]* { TOKEN_STRING(id, yytext); return ID; }
+[a-zA-Z][a-zA-Z0-9]* { TOKEN_STRING(id, yytext); yylval.text = strdup(yytext); return ID; }
 
     /* Integer (decimal/octal) */
 {integer} { TOKEN_STRING(integer, yytext);     return INT_LITERAL; }

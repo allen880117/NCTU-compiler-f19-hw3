@@ -5,8 +5,8 @@
 #include <string>
 using namespace std;
 
-typedef vector< shared_ptr<ASTNodeBase> > NodeList;
-typedef shared_ptr<ASTNodeBase>           Node;
+typedef vector< shared_ptr<class ASTNodeBase> > NodeList;
+typedef shared_ptr<class ASTNodeBase>           Node;
 
 class ASTVisitorBase
 {
@@ -52,7 +52,16 @@ class ProgramNode : public ASTNodeBase
         string end_name;
 
     public:
-        ProgramNode(int, int, string, NodeList, NodeList, Node, int, int, string);
+        ProgramNode(
+            int _line_number, 
+            int _col_number, 
+            string _program_name, 
+            NodeList _declaration_node_list, 
+            NodeList _function_node_list, 
+            Node _compound_statement_list, 
+            int _end_line_number, 
+            int _end_col_number, 
+            string _end_name );
         void accept(ASTVisitorBase &v) {v.visit(this); }
         void print();
 };

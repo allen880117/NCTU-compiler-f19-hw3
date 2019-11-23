@@ -1,10 +1,18 @@
 %{
-#include "include/AST/program.h"
+#include "include/AST/program.hpp"
 #include "include/core/error.h"
 
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdint.h>
+#include <vector>
+#include <memory>
+#include <iostream>
+
+using namespace std;
+
+typedef vector< shared_ptr<ASTNodeBase> > NodeList;
+typedef shared_ptr<ASTNodeBase>           Node;
 
 #define YYLTYPE yyltype
 
@@ -26,8 +34,15 @@ extern char *yytext;
 extern int yylex(void);
 static void yyerror(const char *msg);
 
-static AstNode *root;
+NodeList AST;
 %}
+
+%union {
+    int   value;
+    char* text;
+    int   optype;
+    int   nodetype;
+}
 
 %locations
 
@@ -55,12 +70,15 @@ static AstNode *root;
 %token PRINT READ
 
     /* Identifier */
-%token ID
+%token <text> ID
 
     /* Literal */
 %token INT_LITERAL
 %token REAL_LITERAL
 %token STRING_LITERAL
+
+    /* Nonterminals */
+%type <text> ProgramName
 
 %%
     /*
@@ -69,7 +87,17 @@ static AstNode *root;
 
 Program:
     ProgramName SEMICOLON ProgramBody END ProgramName {
-        root = newProgramNode();
+        AST.push_back(make_shared<ProgramNode>(
+            @1.first_line,
+            @1.first_column,
+            $1,
+            NULL,
+            NULL,
+            NULL,
+            @5.first_line,
+            @5.first_column,
+            $5
+        ));
     }
 ;
 
@@ -148,7 +176,8 @@ ReturnType:
                                    */
 
 Declaration:
-    VAR IdList COLON TypeOrConstant SEMICOLON
+    VAR IdList COLON TypeOrConstant SEMICOLON{
+    }
 ;
 
 TypeOrConstant:
@@ -374,7 +403,7 @@ int main(int argc, const char *argv[]) {
     yyin = fp;
     yyparse();
 
-    freeProgramNode(root);
+    //freeProgramNode(root);
 
     printf("\n"
            "|--------------------------------|\n"
