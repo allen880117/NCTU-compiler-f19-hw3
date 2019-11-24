@@ -54,14 +54,17 @@ ProgramNode::~ProgramNode(){
 }
 void ProgramNode::print(class ASTVisitorBase &v) {    
     std::cout<<"Is Hello?"<<std::endl;
-    /*
-    for(uint i=0; i<declaration_node_list->size(); i++){
-        (*declaration_node_list)[i]->accept(v);
-    }
-    for(uint i=0; i<declaration_node_list->size(); i++){
-        (*declaration_node_list)[i]->accept(v);
-    }
-    */
+
+    if (declaration_node_list != nullptr)
+        for(uint i=0; i<declaration_node_list->size(); i++){
+            (*declaration_node_list)[i]->accept(v);
+        }
+
+    if (function_node_list != nullptr)
+        for(uint i=0; i<function_node_list->size(); i++){
+            (*function_node_list)[i]->accept(v);
+        }
+        
     this->compound_statement_node->accept(v);
 }
 
