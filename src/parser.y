@@ -36,8 +36,8 @@ static void yyerror(const char *msg);
 /* Datatype for Return Non-terminals */
 struct id_info{
     string name;
-    int line_number;
-    int col_number;
+    uint32_t line_number;
+    uint32_t col_number;
 };
 
 static Node AST;
@@ -150,11 +150,7 @@ ProgramName:
 
     /*
     ProgramBody:
-        DeclarationList FunctionList CompoundStatement {
-            $$->_declaration_node_list = *$1; // *(NodeList*)
-            $$->_function_node_list = *$2; // *(NodeList*)
-            $$->_compound_statement_node = $3; // Node
-        }
+        DeclarationList FunctionList CompoundStatement
     ;
     */
 
@@ -164,19 +160,14 @@ DeclarationList:
     }
     |
     Declarations {
-        // $$ = NodeList*
-        // $1 = NodeList*
         $$ = $1;
     }
 ;
 
 Declarations:
     Declaration{
-        // $$ = NodeList*
-        // $1 = Node
-        NodeList* temp;
-        temp->push_back($1);
-        $$ = temp;
+        $$ = new NodeList();
+        $$->push_back($1);
     }
     |
     Declarations Declaration{
@@ -200,9 +191,8 @@ FunctionList:
 
 Functions:
     FunctionDeclaration{
-        NodeList* temp;
-        temp->push_back($1);
-        $$ = temp;
+        $$ = new NodeList();
+        $$->push_back($1);
     }
     |
     Functions FunctionDeclaration{
@@ -249,9 +239,8 @@ FormalArgList:
 
 FormalArgs:
     FormalArg{
-        NodeList* temp;
-        temp->push_back($1);
-        $$ = temp;
+        $$ = new NodeList();
+        $$->push_back($1);
     }
     |
     FormalArgs SEMICOLON FormalArg {
@@ -262,7 +251,7 @@ FormalArgs:
 
 FormalArg:
     IdList COLON Type{
-        NodeList* var_list;
+        NodeList* var_list = new NodeList();
         for(uint i=0; i<$1->size(); i++){
             VariableNode* variable_node = new VariableNode(
                 (*$1)[i].line_number,
@@ -286,21 +275,12 @@ FormalArg:
 
 IdList:
     ID{
-        vector<id_info>* temp;
-        id_info tmpInfo;
-        tmpInfo.name = $1;
-        tmpInfo.line_number = @1.first_line;
-        tmpInfo.col_number = @1.first_column;
-        temp->push_back(tmpInfo);
-        $$ = temp;
+        $$ = new vector<id_info>();
+        $$->push_back(id_info{$1, @1.first_line, @1.first_column});
     }
     |
     IdList COMMA ID{
-        id_info tmpInfo;
-        tmpInfo.name = $3;
-        tmpInfo.line_number = @3.first_line;
-        tmpInfo.col_number = @3.first_column;
-        $1->push_back(tmpInfo);
+        $1->push_back(id_info{$3, @3.first_line, @3.first_column});
         $$ = $1;
     }
 ;
@@ -311,9 +291,9 @@ ReturnType:
     }
     |
     Epsilon{
-        VariableType temp;
-        temp.type_set = UNKNOWN_SET;
-        temp.type = UNKNOWN_TYPE;
+        $$ = new VariableType;
+        $$->type_set = UNKNOWN_SET;
+        $$->type = UNKNOWN_TYPE;
     }
 ;
 
