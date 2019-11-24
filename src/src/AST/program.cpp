@@ -52,24 +52,8 @@ ProgramNode::~ProgramNode(){
     delete declaration_node_list;
     delete function_node_list;
 }
-void ProgramNode::print(class ASTVisitorBase &v) {    
-    v.print_space();
+void ProgramNode::print() {    
     std::cout<<"Is Hello?"<<std::endl;
-
-    v.space_counter_increase();
-        if (declaration_node_list != nullptr)
-            for(uint i=0; i<declaration_node_list->size(); i++){
-                (*declaration_node_list)[i]->accept(v);
-            }
-
-        if (function_node_list != nullptr)
-            for(uint i=0; i<function_node_list->size(); i++){
-                (*function_node_list)[i]->accept(v);
-            }
-
-        this->compound_statement_node->accept(v);
-    v.space_counter_decrease();
-
 }
 
 DeclarationNode::DeclarationNode(
@@ -80,7 +64,7 @@ DeclarationNode::DeclarationNode(
                 this->col_number = _col_number;
                 this->variables_node_list = _variables_node_list;
             }
-void DeclarationNode::print(class ASTVisitorBase &v) {std::cout<<"Is Hello?"<<std::endl;}
+void DeclarationNode::print() {std::cout<<"Is Hello?"<<std::endl;}
 
 VariableNode::VariableNode(
             int _line_number, 
@@ -94,8 +78,8 @@ VariableNode::VariableNode(
                 this->type = _type;
                 this->constant_value_node = _constant_value_node;
             }
-void VariableNode::print(class ASTVisitorBase &v) {std::cout<<"Is Hello?"<<std::endl;}
-void ConstantValueNode::print(class ASTVisitorBase &v) {std::cout<<"Is Hello?"<<std::endl;}
+void VariableNode::print() {std::cout<<"Is Hello?"<<std::endl;}
+void ConstantValueNode::print() {std::cout<<"Is Hello?"<<std::endl;}
 
 FunctionNode::FunctionNode(
             int _line_number, 
@@ -116,7 +100,7 @@ FunctionNode::FunctionNode(
                 this->end_line_number = _end_line_number;
                 this->end_col_number = _end_col_number;
             }
-void FunctionNode::print(class ASTVisitorBase &v) {std::cout<<"Is Hello?"<<std::endl;}
+void FunctionNode::print() {std::cout<<"Is Hello?"<<std::endl;}
 
 CompoundStatementNode::CompoundStatementNode(
             int _line_number, 
@@ -126,20 +110,17 @@ CompoundStatementNode::CompoundStatementNode(
                 line_number=_line_number;
                 col_number=_col_number;
             }
-void CompoundStatementNode::print(class ASTVisitorBase &v) {
-    v.print_space();
+void CompoundStatementNode::print() {
     std::cout<<"Is Hello?"<<std::endl;
-    v.space_counter_increase();
-    v.space_counter_decrease();
 }
-void AssignmentNode::print(class ASTVisitorBase &v) {std::cout<<"Is Hello?"<<std::endl;}
-void PrintNode::print(class ASTVisitorBase &v) {std::cout<<"Is Hello?"<<std::endl;}
-void ReadNode::print(class ASTVisitorBase &v) {std::cout<<"Is Hello?"<<std::endl;}
-void VariableReferenceNode::print(class ASTVisitorBase &v) {std::cout<<"Is Hello?"<<std::endl;}
-void BinaryOperatorNode::print(class ASTVisitorBase &v) {std::cout<<"Is Hello?"<<std::endl;}
-void UnaryOperatorNode::print(class ASTVisitorBase &v) {std::cout<<"Is Hello?"<<std::endl;}
-void IfNode::print(class ASTVisitorBase &v) {std::cout<<"Is Hello?"<<std::endl;}
-void WhileNode::print(class ASTVisitorBase &v) {std::cout<<"Is Hello?"<<std::endl;}
-void ForNode::print(class ASTVisitorBase &v) {std::cout<<"Is Hello?"<<std::endl;}
-void ReturnNode::print(class ASTVisitorBase &v) {std::cout<<"Is Hello?"<<std::endl;}
-void FunctionCallNode::print(class ASTVisitorBase &v) {std::cout<<"Is Hello?"<<std::endl;}
+void AssignmentNode::print() {std::cout<<"Is Hello?"<<std::endl;}
+void PrintNode::print() {std::cout<<"Is Hello?"<<std::endl;}
+void ReadNode::print() {std::cout<<"Is Hello?"<<std::endl;}
+void VariableReferenceNode::print() {std::cout<<"Is Hello?"<<std::endl;}
+void BinaryOperatorNode::print() {std::cout<<"Is Hello?"<<std::endl;}
+void UnaryOperatorNode::print() {std::cout<<"Is Hello?"<<std::endl;}
+void IfNode::print() {std::cout<<"Is Hello?"<<std::endl;}
+void WhileNode::print() {std::cout<<"Is Hello?"<<std::endl;}
+void ForNode::print() {std::cout<<"Is Hello?"<<std::endl;}
+void ReturnNode::print() {std::cout<<"Is Hello?"<<std::endl;}
+void FunctionCallNode::print() {std::cout<<"Is Hello?"<<std::endl;}

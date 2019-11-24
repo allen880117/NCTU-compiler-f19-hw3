@@ -69,7 +69,7 @@ class ASTNodeBase
 
 class ProgramNode : public ASTNodeBase
 {
-    private:
+    public:
         int  line_number; // program name
         int  col_number;  // program name
         string program_name;
@@ -94,13 +94,13 @@ class ProgramNode : public ASTNodeBase
             int _end_col_number, 
             string _end_name );
         void accept(ASTVisitorBase &v) {v.visit(this); }
-        void print(class ASTVisitorBase &v);
+        void print();
         ~ProgramNode();
 };
 
 class DeclarationNode : public ASTNodeBase
 {
-    private:
+    public:
         int  line_number; // var
         int  col_number;  // var
         NodeList* variables_node_list; // Variables
@@ -111,13 +111,13 @@ class DeclarationNode : public ASTNodeBase
             int _col_number, 
             NodeList* _variables_node_list);
         void accept(ASTVisitorBase &v) {v.visit(this); }
-        void print(class ASTVisitorBase &v);
+        void print();
         ~DeclarationNode(){};
 };
 
 class VariableNode : public ASTNodeBase
 {
-    private:
+    public:
         int  line_number; // variable name
         int  col_number;  // variable name
         string variable_name;
@@ -132,13 +132,13 @@ class VariableNode : public ASTNodeBase
             VariableType* _type, 
             Node _constant_value_node);
         void accept(ASTVisitorBase &v) {v.visit(this); }
-        void print(class ASTVisitorBase &v);
+        void print();
         ~VariableNode(){};
 };
 
 class ConstantValueNode : public ASTNodeBase
 {
-    private:
+    public:
         int  line_number; // constant value
         int  col_number;  // constant value
         string constant_value; // Not sure its type
@@ -146,12 +146,12 @@ class ConstantValueNode : public ASTNodeBase
     public:
         ConstantValueNode(int, int, string);
         void accept(ASTVisitorBase &v) {v.visit(this); }
-        void print(class ASTVisitorBase &v);
+        void print();
 };
 
 class FunctionNode : public ASTNodeBase
 {
-    private:
+    public:
         int  line_number; // function name
         int  col_number;  // function name
         string function_name;
@@ -174,12 +174,12 @@ class FunctionNode : public ASTNodeBase
             int _end_col_number, 
             string _end_name);
         void accept(ASTVisitorBase &v) {v.visit(this); }
-        void print(class ASTVisitorBase &v);
+        void print();
 };
 
 class CompoundStatementNode : public ASTNodeBase
 {
-    private:
+    public:
         int  line_number; // begin
         int  col_number;  // begin
         NodeList* declaration_node_list; // Local variable and constant declarations
@@ -192,12 +192,12 @@ class CompoundStatementNode : public ASTNodeBase
             NodeList* _declaration_node_list, 
             NodeList* _statement_node_list);
         void accept(ASTVisitorBase &v) {v.visit(this); }
-        void print(class ASTVisitorBase &v);
+        void print();
 };
 
 class AssignmentNode : public ASTNodeBase
 {
-    private:
+    public:
         int  line_number; // :=
         int  col_number;  // :=
         Node variable_reference_node; // Lvalue
@@ -206,12 +206,12 @@ class AssignmentNode : public ASTNodeBase
     public:
         AssignmentNode(int, int, Node, Node);
         void accept(ASTVisitorBase &v) {v.visit(this); }
-        void print(class ASTVisitorBase &v);
+        void print();
 };
 
 class PrintNode : public ASTNodeBase
 {
-    private:
+    public:
         int  line_number; // print
         int  col_number;  // print
         Node expression_node; // Target
@@ -219,12 +219,12 @@ class PrintNode : public ASTNodeBase
     public:
         PrintNode(int, int, Node);
         void accept(ASTVisitorBase &v) {v.visit(this); }
-        void print(class ASTVisitorBase &v);
+        void print();
 };
 
 class ReadNode : public ASTNodeBase
 {
-    private:
+    public:
         int  line_number; // print
         int  col_number;  // print
         Node variable_reference_node; // Target
@@ -232,12 +232,12 @@ class ReadNode : public ASTNodeBase
     public:
         ReadNode(int, int, Node);
         void accept(ASTVisitorBase &v) {v.visit(this); }
-        void print(class ASTVisitorBase &v);
+        void print();
 };
 
 class VariableReferenceNode : public ASTNodeBase
 {
-    private:
+    public:
         int  line_number; // variable name
         int  col_number;  // varibble name
         string variable_name;
@@ -246,12 +246,12 @@ class VariableReferenceNode : public ASTNodeBase
     public:
         VariableReferenceNode(int, int, string, NodeList*);
         void accept(ASTVisitorBase &v) {v.visit(this); }
-        void print(class ASTVisitorBase &v);
+        void print();
 };
 
 class BinaryOperatorNode : public ASTNodeBase
 {
-    private:
+    public:
         int  line_number; // operator
         int  col_number;  // operator
         string op;
@@ -261,12 +261,12 @@ class BinaryOperatorNode : public ASTNodeBase
     public:
         BinaryOperatorNode(int, int, string, Node, Node);
         void accept(ASTVisitorBase &v) {v.visit(this); }
-        void print(class ASTVisitorBase &v);
+        void print();
 };
 
 class UnaryOperatorNode : public ASTNodeBase
 {
-    private:
+    public:
         int  line_number; // operator
         int  col_number;  // operator
         string op;
@@ -275,12 +275,12 @@ class UnaryOperatorNode : public ASTNodeBase
     public:
         UnaryOperatorNode(int, int, string, Node);
         void accept(ASTVisitorBase &v) {v.visit(this); }
-        void print(class ASTVisitorBase &v);
+        void print();
 };
 
 class IfNode : public ASTNodeBase
 {
-    private:
+    public:
         int  line_number; // if
         int  col_number;  // if
         Node condition; // an expression node
@@ -290,12 +290,12 @@ class IfNode : public ASTNodeBase
     public:
         IfNode(int, int, Node, NodeList*, NodeList*);
         void accept(ASTVisitorBase &v) {v.visit(this); }
-        void print(class ASTVisitorBase &v);
+        void print();
 };
 
 class WhileNode : public ASTNodeBase
 {
-    private:
+    public:
         int  line_number; // while
         int  col_number;  // while
         Node condition; // an expression node
@@ -304,12 +304,12 @@ class WhileNode : public ASTNodeBase
     public:
         WhileNode(int, int, Node, NodeList*);
         void accept(ASTVisitorBase &v) {v.visit(this); }
-        void print(class ASTVisitorBase &v);
+        void print();
 };
 
 class ForNode : public ASTNodeBase
 {
-    private:
+    public:
         int  line_number; // for
         int  col_number;  // for
         Node loop_variable_declaration; // an declaration node
@@ -320,12 +320,12 @@ class ForNode : public ASTNodeBase
     public:
         ForNode(int, int, Node, Node, Node, NodeList*);
         void accept(ASTVisitorBase &v) {v.visit(this); }
-        void print(class ASTVisitorBase &v);
+        void print();
 };
 
 class ReturnNode : public ASTNodeBase
 {
-    private:
+    public:
         int  line_number; // return
         int  col_number;  // return
         Node return_value; // an expression node
@@ -333,12 +333,12 @@ class ReturnNode : public ASTNodeBase
     public:
         ReturnNode(int, int, Node);
         void accept(ASTVisitorBase &v) {v.visit(this); }
-        void print(class ASTVisitorBase &v);
+        void print();
 };
 
 class FunctionCallNode : public ASTNodeBase
 {
-    private:
+    public:
         int  line_number; // function name
         int  col_number;  // function name
         string function_name;
@@ -347,5 +347,5 @@ class FunctionCallNode : public ASTNodeBase
     public:
         FunctionCallNode(int, int, string, NodeList*);
         void accept(ASTVisitorBase &v) {v.visit(this); }
-        void print(class ASTVisitorBase &v);
+        void print();
 };
