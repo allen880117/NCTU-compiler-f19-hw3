@@ -48,16 +48,17 @@ static Node AST;
 
     /* Union Define */
 %union {
-    int   value;
-    char* text;
+    int    val;
+    double dval;
+    char*  text;
 
-    int   op_type;
+    int    op_type;
 
     NodeList* node_list_ptr;
     Node      node;
 
     vector<struct id_info>* id_list_ptr;
-    VariableType* variable_type_ptr;
+    VariableInfo*           variable_info_ptr;
 }
 
 %locations
@@ -89,9 +90,9 @@ static Node AST;
 %token <text> ID
 
     /* Literal */
-%token INT_LITERAL
-%token REAL_LITERAL
-%token STRING_LITERAL
+%token <val> INT_LITERAL
+%token <dval> REAL_LITERAL
+%token <text> STRING_LITERAL
 
     /* Type of Nonterminals */
 %type <text> ProgramName
@@ -112,10 +113,13 @@ static Node AST;
 %type <node> CompoundStatement
 
 %type <id_list_ptr> IdList
-%type <variable_type_ptr> ReturnType
-%type <variable_type_ptr> Type
-%type <variable_type_ptr> ScalarType
-%type <variable_type_ptr> ArrType
+%type <variable_info_ptr> ReturnType
+%type <variable_info_ptr> Type
+%type <variable_info_ptr> ScalarType
+%type <variable_info_ptr> ArrType
+%type <variable_info_ptr> ArrDecl
+%type <variable_info_ptr> TypeOrConstant
+%type <variable_info_ptr> LiteralConstant
 
 %%
     /*
@@ -124,9 +128,9 @@ static Node AST;
 
 Program:
     ProgramName SEMICOLON DeclarationList FunctionList CompoundStatement END ProgramName {
-        // Program Node        
+        // Program Node (Also root Node)
         string return_type = "void";
-        ProgramNode* program_node = new ProgramNode(
+        AST = new ProgramNode(
             @1.first_line,
             @1.first_column,
             $1,
@@ -138,7 +142,6 @@ Program:
             @7.first_column,
             $7
         );
-        AST = program_node;
     }
 ;
 
@@ -171,9 +174,6 @@ Declarations:
     }
     |
     Declarations Declaration{
-        // $$ = NodeList*
-        // $1 = NodeList*
-        // $2 = Node
         $1->push_back($2);
         $$ = $1;
     }
@@ -206,7 +206,7 @@ FunctionDeclaration:
     CompoundStatement
     END FunctionName {
         // Function Node
-        FunctionNode* function_node = new FunctionNode(
+        $$ = new FunctionNode(
             @1.first_line,
             @1.first_column,
             $1,
@@ -217,7 +217,6 @@ FunctionDeclaration:
             @9.first_column,
             $9
         );
-        $$ = function_node;
     }
 ;
 
@@ -251,6 +250,7 @@ FormalArgs:
 
 FormalArg:
     IdList COLON Type{
+        // Declaration Node (but location is not KWvar)
         NodeList* var_list = new NodeList();
         for(uint i=0; i<$1->size(); i++){
             VariableNode* variable_node = new VariableNode(
@@ -263,13 +263,11 @@ FormalArg:
             var_list->push_back(variable_node);
         }
 
-        DeclarationNode* declaration_node = new DeclarationNode(
+        $$ = new DeclarationNode(
             @1.first_line,
             @1.first_column,
             var_list
         );
-
-        $$ = declaration_node;
     }
 ;
 
@@ -291,7 +289,7 @@ ReturnType:
     }
     |
     Epsilon{
-        $$ = new VariableType;
+        $$ = new VariableInfo;
         $$->type_set = UNKNOWN_SET;
         $$->type = UNKNOWN_TYPE;
     }
@@ -303,14 +301,57 @@ ReturnType:
 
 Declaration:
     VAR IdList COLON TypeOrConstant SEMICOLON{
-        // Variable Node
+        // Declaration Node
+        NodeList* var_list = new NodeList();
+        for(uint i=0; i<$2->size(); i++){
+            if( $4->type_set == SET_CONSTANT_LITERAL ){ 
+                // Literal Constant
+                ConstantValueNode* constant_value_node = new ConstantValueNode(
+                    @4.first_line,
+                    @4.first_column,
+                    $4
+                );
+
+                VariableNode* variable_node = new VariableNode(
+                    (*$2)[i].line_number,
+                    (*$2)[i].col_number,
+                    (*$2)[i].name,
+                    $4,
+                    constant_value_node
+                );
+
+                var_list->push_back(variable_node);
+                
+            } else { 
+                // Type
+                VariableNode* variable_node = new VariableNode(
+                    (*$2)[i].line_number,
+                    (*$2)[i].col_number,
+                    (*$2)[i].name,
+                    $4,
+                    nullptr
+                );
+
+                var_list->push_back(variable_node);
+            }
+        }
+
+        $$ = new DeclarationNode(
+            @1.first_line,
+            @1.first_column,
+            var_list
+        );
     }
 ;
 
 TypeOrConstant:
-    Type
+    Type{
+        $$ = $1;
+    }
     |
-    LiteralConstant
+    LiteralConstant{
+        $$ = $1;
+    }
 ;
 
 Type:
@@ -324,35 +365,89 @@ Type:
 ;
 
 ScalarType:
-    INTEGER
+    INTEGER{
+        $$ = new VariableInfo();
+        $$->type_set = SET_SCALAR;
+        $$->type = TYPE_INTEGER;
+    }
     |
-    REAL
+    REAL{
+        $$ = new VariableInfo();
+        $$->type_set = SET_SCALAR;
+        $$->type = TYPE_REAL;
+    }
     |
-    STRING
+    STRING{
+        $$ = new VariableInfo();
+        $$->type_set = SET_SCALAR;
+        $$->type = TYPE_STRING;
+    }
     |
-    BOOLEAN
+    BOOLEAN{
+        $$ = new VariableInfo();
+        $$->type_set = SET_SCALAR;
+        $$->type = TYPE_BOOLEAN;
+    }
 ;
 
 ArrType:
-    ArrDecl ScalarType
+    ArrDecl ScalarType{
+        $$ = new VariableInfo();
+        $$->type_set = SET_ACCUMLATED;
+        $$->type = $2->type;
+        $$->array_range = $1->array_range;
+    }
 ;
 
 ArrDecl:
-    ARRAY INT_LITERAL TO INT_LITERAL OF
+    ARRAY INT_LITERAL TO INT_LITERAL OF{
+        $$ = new VariableInfo();
+        $$->type_set = SET_ACCUMLATED;
+        $$->type = UNKNOWN_TYPE;
+        $$->array_range.push_back(IntPair{$2, $4});
+    }
     |
-    ArrDecl ARRAY INT_LITERAL TO INT_LITERAL OF
+    ArrDecl ARRAY INT_LITERAL TO INT_LITERAL OF{
+        $1->array_range.push_back(IntPair{$3, $5});
+        $$ = $1;
+    }
 ;
 
 LiteralConstant:
-    INT_LITERAL
+    INT_LITERAL{
+        $$ = new VariableInfo();
+        $$->type_set=SET_CONSTANT_LITERAL;
+        $$->type=TYPE_INTEGER;
+        $$->int_literal=$1;
+    }
     |
-    REAL_LITERAL
+    REAL_LITERAL{
+        $$ = new VariableInfo();
+        $$->type_set=SET_CONSTANT_LITERAL;
+        $$->type=TYPE_REAL;
+        $$->real_literal=$1;
+    }
     |
-    STRING_LITERAL
+    STRING_LITERAL{
+        $$ = new VariableInfo();
+        $$->type_set=SET_CONSTANT_LITERAL;
+        $$->type=TYPE_STRING;
+        $$->string_literal=string($1);
+    }
     |
-    TRUE
+    TRUE{
+        $$ = new VariableInfo();
+        $$->type_set=SET_CONSTANT_LITERAL;
+        $$->type=TYPE_BOOLEAN;
+        $$->boolean_literal=Boolean_TRUE;
+    }
     |
-    FALSE
+    FALSE{
+        $$ = new VariableInfo();
+        $$->type_set=SET_CONSTANT_LITERAL;
+        $$->type=TYPE_BOOLEAN;
+        $$->boolean_literal=Boolean_FALSE;
+    }
 ;
 
     /*

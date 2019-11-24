@@ -11,6 +11,7 @@ typedef class ASTNodeBase*           Node;
 enum enumTypeSet{
     SET_SCALAR = 300,
     SET_ACCUMLATED,
+    SET_CONSTANT_LITERAL,
     UNKNOWN_SET
 };
 
@@ -27,11 +28,21 @@ typedef struct __IntPair{
     int end;
 } IntPair;
 
-typedef struct __VariableType{
+enum BooleanLiteral{
+    Boolean_TRUE = 400,
+    Boolean_FALSE,
+    UNKNOWN
+};
+
+typedef struct __VariableInfo{
     enumTypeSet type_set;
     enumType type;
-    vector<IntPair> ArrayRange;
-} VariableType ;
+    vector<IntPair> array_range;
+    int int_literal;
+    double real_literal;
+    string string_literal;
+    BooleanLiteral boolean_literal;
+} VariableInfo ;
 
 class ASTVisitorBase
 {
@@ -74,8 +85,8 @@ class ProgramNode : public ASTNodeBase
         int  col_number;  // program name
         string program_name;
         string return_type;
-        NodeList* declaration_node_list;
-        NodeList* function_node_list;
+        NodeList* declaration_node_list; // zero or more
+        NodeList* function_node_list; // zero or more
         Node compound_statement_node;
         int  end_line_number; // program name after end
         int  end_col_number;  // program name after end
@@ -121,15 +132,15 @@ class VariableNode : public ASTNodeBase
         int  line_number; // variable name
         int  col_number;  // variable name
         string variable_name;
-        VariableType* type;
-        Node constant_value_node; // constant value
+        VariableInfo* type;
+        Node constant_value_node; // constant value (zero or one)
     
     public:
         VariableNode(
             int _line_number, 
             int _col_number, 
             string _variable_name, 
-            VariableType* _type, 
+            VariableInfo* _type, 
             Node _constant_value_node);
         void accept(ASTVisitorBase &v) {v.visit(this); }
         void print();
@@ -141,10 +152,13 @@ class ConstantValueNode : public ASTNodeBase
     public:
         int  line_number; // constant value
         int  col_number;  // constant value
-        string constant_value; // Not sure its type
+        VariableInfo* constant_value; // Not sure its type
     
     public:
-        ConstantValueNode(int, int, string);
+        ConstantValueNode(
+            int _line_number, 
+            int _col_number, 
+            VariableInfo* _constant_value);
         void accept(ASTVisitorBase &v) {v.visit(this); }
         void print();
 };
@@ -155,8 +169,8 @@ class FunctionNode : public ASTNodeBase
         int  line_number; // function name
         int  col_number;  // function name
         string function_name;
-        NodeList* parameters; // a list of declaration nodes
-        VariableType* return_type;
+        NodeList* parameters; // a list of declaration nodes (zero or more)
+        VariableInfo* return_type;
         Node body; // a compound statement node
         int  end_line_number; // function name after end
         int  end_col_number;  // function name after end
@@ -168,7 +182,7 @@ class FunctionNode : public ASTNodeBase
             int _col_number, 
             string _function_name, 
             NodeList* _parameters, 
-            VariableType* _return_type, 
+            VariableInfo* _return_type, 
             Node _body, 
             int _end_line_number, 
             int _end_col_number, 
@@ -182,8 +196,8 @@ class CompoundStatementNode : public ASTNodeBase
     public:
         int  line_number; // begin
         int  col_number;  // begin
-        NodeList* declaration_node_list; // Local variable and constant declarations
-        NodeList* statement_node_list; // Statements
+        NodeList* declaration_node_list; // Local variable and constant declarations (zero or more)
+        NodeList* statement_node_list; // Statements (zero or more)
 
     public:
         CompoundStatementNode(
@@ -284,8 +298,8 @@ class IfNode : public ASTNodeBase
         int  line_number; // if
         int  col_number;  // if
         Node condition; // an expression node
-        NodeList* body; // a list of statement nodes
-        NodeList* body_of_else; // a list of statement nodes
+        NodeList* body; // a list of statement nodes (zero or more)
+        NodeList* body_of_else; // a list of statement nodes (zero or more)
 
     public:
         IfNode(int, int, Node, NodeList*, NodeList*);
@@ -299,7 +313,7 @@ class WhileNode : public ASTNodeBase
         int  line_number; // while
         int  col_number;  // while
         Node condition; // an expression node
-        NodeList* body; // a list of statement nodes
+        NodeList* body; // a list of statement nodes (zero or more)
 
     public:
         WhileNode(int, int, Node, NodeList*);
@@ -315,7 +329,7 @@ class ForNode : public ASTNodeBase
         Node loop_variable_declaration; // an declaration node
         Node initial_statement; // an assignment node
         Node condition; // an expression node
-        NodeList* body; // a list of statement nodes
+        NodeList* body; // a list of statement nodes (zero or more)
 
     public:
         ForNode(int, int, Node, Node, Node, NodeList*);
@@ -342,7 +356,7 @@ class FunctionCallNode : public ASTNodeBase
         int  line_number; // function name
         int  col_number;  // function name
         string function_name;
-        NodeList* arguments; // a list of expression nodes
+        NodeList* arguments; // a list of expression nodes (zero ro more);
 
     public:
         FunctionCallNode(int, int, string, NodeList*);

@@ -45,7 +45,7 @@ VariableNode::VariableNode(
             int _line_number, 
             int _col_number, 
             string _variable_name, 
-            VariableType* _type, 
+            VariableInfo* _type, 
             Node _constant_value_node){
                 this->line_number = _line_number;
                 this->col_number = _col_number;
@@ -54,6 +54,15 @@ VariableNode::VariableNode(
                 this->constant_value_node = _constant_value_node;
             }
 void VariableNode::print() {std::cout<<"Is Hello?"<<std::endl;}
+
+ConstantValueNode::ConstantValueNode(
+            int _line_number, 
+            int _col_number, 
+            VariableInfo* _constant_value){
+                this->line_number = _line_number;
+                this->col_number = _col_number;
+                this->constant_value = _constant_value;
+            }
 void ConstantValueNode::print() {std::cout<<"Is Hello?"<<std::endl;}
 
 FunctionNode::FunctionNode(
@@ -61,7 +70,7 @@ FunctionNode::FunctionNode(
             int _col_number, 
             string _function_name, 
             NodeList* _parameters, 
-            VariableType* _return_type, 
+            VariableInfo* _return_type, 
             Node _body, 
             int _end_line_number, 
             int _end_col_number, 
