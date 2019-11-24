@@ -1,6 +1,6 @@
 %{
-#include "include/AST/program.hpp"
 #include "include/AST/ast.hpp"
+#include "include/visitor/visitor.hpp"
 #include "include/core/error.h"
 
 #include <stdio.h>
@@ -44,7 +44,7 @@ static Node AST;
 %}
 
     /* Useful Header */
-%code requires { #include "include/AST/program.hpp" }
+%code requires { #include "include/AST/ast.hpp" }
 
     /* Union Define */
 %union {

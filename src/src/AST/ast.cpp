@@ -1,49 +1,107 @@
 #include "AST/ast.hpp"
-#include "AST/program.hpp"
 #include <iostream>
+#include <string>
 
-// TODO
-void ASTVisitor::visit(ProgramNode *m) {
-    this->print_space();
-        m->print();
-    
-    this->space_counter_increase();
-        if (m->declaration_node_list != nullptr)
-            for(uint i=0; i< m->declaration_node_list->size(); i++){
-                (*(m->declaration_node_list))[i]->accept(*this);
-            }
-
-        if (m->function_node_list != nullptr)
-            for(uint i=0; i< m->function_node_list->size(); i++){
-                (*(m->function_node_list))[i]->accept(*this);
-            }
-
-        m->compound_statement_node->accept(*this);
-    this->space_counter_decrease();
+ProgramNode::ProgramNode(
+    int _line_number, 
+    int _col_number, 
+    string _program_name, 
+    string _return_type,
+    NodeList* _declaration_node_list, 
+    NodeList* _function_node_list, 
+    Node _compound_statement_node, 
+    int _end_line_number, 
+    int _end_col_number, 
+    string _end_name ){
+        line_number = _line_number;
+        col_number = _col_number;
+        program_name = _program_name;
+        return_type = _return_type;
+        declaration_node_list = _declaration_node_list;
+        function_node_list = _function_node_list;
+        compound_statement_node = _compound_statement_node;
+        end_line_number = _end_line_number;
+        end_col_number = _end_col_number;
+        end_name = _end_name;
+    }
+ProgramNode::~ProgramNode(){
+    delete compound_statement_node;
+    for(uint i=0; i<declaration_node_list->size(); i++)
+        delete (*declaration_node_list)[i];
+    for(uint i=0; i<function_node_list->size(); i++)
+        delete (*function_node_list)[i];
+    delete declaration_node_list;
+    delete function_node_list;
 }
-void ASTVisitor::visit(DeclarationNode *m) {m->print();};
-void ASTVisitor::visit(VariableNode *m) {m->print();};
-void ASTVisitor::visit(ConstantValueNode *m) {m->print();};
-void ASTVisitor::visit(FunctionNode *m) {m->print();};
-void ASTVisitor::visit(CompoundStatementNode *m) {
-    this->print_space();
-        m->print();
-    
-    this->space_counter_increase();
-    this->space_counter_decrease();    
-};
-void ASTVisitor::visit(AssignmentNode *m) {m->print();};
-void ASTVisitor::visit(PrintNode *m) {m->print();};
-void ASTVisitor::visit(ReadNode *m) {m->print();};
-void ASTVisitor::visit(VariableReferenceNode *m) {m->print();};
-void ASTVisitor::visit(BinaryOperatorNode *m) {m->print();};
-void ASTVisitor::visit(UnaryOperatorNode *m) {m->print();};
-void ASTVisitor::visit(IfNode *m) {m->print();};
-void ASTVisitor::visit(WhileNode *m) {m->print();};
-void ASTVisitor::visit(ForNode *m) {m->print();};
-void ASTVisitor::visit(ReturnNode *m) {m->print();};
-void ASTVisitor::visit(FunctionCallNode *m) {m->print();};
+void ProgramNode::print() {    
+    std::cout<<"Is Hello?"<<std::endl;
+}
 
-void ASTVisitorBase::space_counter_increase() {this->space_counter++;}
-void ASTVisitorBase::space_counter_decrease() {this->space_counter--;}
-void ASTVisitorBase::print_space() {for (size_t i = 0; i < space_counter; i++) { std::cout << "  "; }}
+DeclarationNode::DeclarationNode(
+            int _line_number, 
+            int _col_number, 
+            NodeList* _variables_node_list){
+                this->line_number = _line_number;
+                this->col_number = _col_number;
+                this->variables_node_list = _variables_node_list;
+            }
+void DeclarationNode::print() {std::cout<<"Is Hello?"<<std::endl;}
+
+VariableNode::VariableNode(
+            int _line_number, 
+            int _col_number, 
+            string _variable_name, 
+            VariableType* _type, 
+            Node _constant_value_node){
+                this->line_number = _line_number;
+                this->col_number = _col_number;
+                this->variable_name = _variable_name;
+                this->type = _type;
+                this->constant_value_node = _constant_value_node;
+            }
+void VariableNode::print() {std::cout<<"Is Hello?"<<std::endl;}
+void ConstantValueNode::print() {std::cout<<"Is Hello?"<<std::endl;}
+
+FunctionNode::FunctionNode(
+            int _line_number, 
+            int _col_number, 
+            string _function_name, 
+            NodeList* _parameters, 
+            VariableType* _return_type, 
+            Node _body, 
+            int _end_line_number, 
+            int _end_col_number, 
+            string _end_name){
+                this->line_number = _line_number;
+                this->col_number = _col_number;
+                this->function_name = _function_name;
+                this->parameters = _parameters;
+                this->return_type = _return_type;
+                this->body = _body;
+                this->end_line_number = _end_line_number;
+                this->end_col_number = _end_col_number;
+            }
+void FunctionNode::print() {std::cout<<"Is Hello?"<<std::endl;}
+
+CompoundStatementNode::CompoundStatementNode(
+            int _line_number, 
+            int _col_number, 
+            NodeList* _declaration_node_list, 
+            NodeList* _statement_node_list){
+                line_number=_line_number;
+                col_number=_col_number;
+            }
+void CompoundStatementNode::print() {
+    std::cout<<"Is Hello?"<<std::endl;
+}
+void AssignmentNode::print() {std::cout<<"Is Hello?"<<std::endl;}
+void PrintNode::print() {std::cout<<"Is Hello?"<<std::endl;}
+void ReadNode::print() {std::cout<<"Is Hello?"<<std::endl;}
+void VariableReferenceNode::print() {std::cout<<"Is Hello?"<<std::endl;}
+void BinaryOperatorNode::print() {std::cout<<"Is Hello?"<<std::endl;}
+void UnaryOperatorNode::print() {std::cout<<"Is Hello?"<<std::endl;}
+void IfNode::print() {std::cout<<"Is Hello?"<<std::endl;}
+void WhileNode::print() {std::cout<<"Is Hello?"<<std::endl;}
+void ForNode::print() {std::cout<<"Is Hello?"<<std::endl;}
+void ReturnNode::print() {std::cout<<"Is Hello?"<<std::endl;}
+void FunctionCallNode::print() {std::cout<<"Is Hello?"<<std::endl;}
