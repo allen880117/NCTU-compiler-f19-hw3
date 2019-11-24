@@ -15,16 +15,16 @@ ProgramNode::ProgramNode(
     int _end_line_number, 
     int _end_col_number, 
     string _end_name ){
-        line_number = _line_number;
-        col_number = _col_number;
-        program_name = _program_name;
-        return_type = _return_type;
-        declaration_node_list = _declaration_node_list;
-        function_node_list = _function_node_list;
-        compound_statement_node = _compound_statement_node;
-        end_line_number = _end_line_number;
-        end_col_number = _end_col_number;
-        end_name = _end_name;
+        this->line_number = _line_number;
+        this->col_number = _col_number;
+        this->program_name = _program_name;
+        this->return_type = _return_type;
+        this->declaration_node_list = _declaration_node_list;
+        this->function_node_list = _function_node_list;
+        this->compound_statement_node = _compound_statement_node;
+        this->end_line_number = _end_line_number;
+        this->end_col_number = _end_col_number;
+        this->end_name = _end_name;
     }
 void ProgramNode::print() {    
     std::cout << "program <line: " << line_number
@@ -227,8 +227,10 @@ CompoundStatementNode::CompoundStatementNode(
             int _col_number, 
             NodeList* _declaration_node_list, 
             NodeList* _statement_node_list){
-                line_number=_line_number;
-                col_number=_col_number;
+                this->line_number = _line_number;
+                this->col_number = _col_number;
+                this->declaration_node_list = _declaration_node_list;
+                this->statement_node_list = _statement_node_list;
             }
 void CompoundStatementNode::print() {
     std::cout << "compound statement <line: " << line_number
@@ -246,7 +248,11 @@ AssignmentNode::AssignmentNode(
                 this->variable_reference_node = _variable_reference_node;
                 this->expression_node = _expression_node;
             }
-void AssignmentNode::print() {std::cout<<"Is Hello?"<<std::endl;}
+void AssignmentNode::print() {
+    std::cout << "assignment statement <line: " << line_number
+        << ", col: " << col_number
+        << "> " << std::endl;
+}
 
 PrintNode::PrintNode(
             int _line_number, 
@@ -256,7 +262,11 @@ PrintNode::PrintNode(
                 this->col_number = _col_number;
                 this->expression_node = _expression_node;
             }
-void PrintNode::print() {std::cout<<"Is Hello?"<<std::endl;}
+void PrintNode::print() {
+    std::cout << "print statement <line: " << line_number
+        << ", col: " << col_number
+        << "> " << std::endl;
+}
 
 ReadNode::ReadNode(
             int _line_number, 
@@ -266,7 +276,11 @@ ReadNode::ReadNode(
                 this->col_number = _col_number;
                 this->variable_reference_node = _variable_reference_node;
             }
-void ReadNode::print() {std::cout<<"Is Hello?"<<std::endl;}
+void ReadNode::print() {
+    std::cout << "read statement <line: " << line_number
+        << ", col: " << col_number
+        << "> " << std::endl;
+}
 
 VariableReferenceNode::VariableReferenceNode(
             int _line_number, 
@@ -278,7 +292,12 @@ VariableReferenceNode::VariableReferenceNode(
                 this->variable_name = _variable_name;
                 this->expression_node_list = _expression_node_list;
             }
-void VariableReferenceNode::print() {std::cout<<"Is Hello?"<<std::endl;}
+void VariableReferenceNode::print() {
+    std::cout << "variable reference <line: " << line_number
+        << ", col: " << col_number
+        << "> " << variable_name 
+        << std::endl;
+}
 
 BinaryOperatorNode::BinaryOperatorNode(
             int _line_number, 
@@ -292,7 +311,33 @@ BinaryOperatorNode::BinaryOperatorNode(
                 this->left_operand = _left_operand;
                 this->right_operand = _right_operand;
             }
-void BinaryOperatorNode::print() {std::cout<<"Is Hello?"<<std::endl;}
+void BinaryOperatorNode::print() {
+    std::cout << "binary operator <line: " << line_number
+        << ", col: " << col_number
+        << "> ";
+    
+    // cout << operator
+    switch(op){
+        case OP_OR:               std::cout<<"or"; break;
+        case OP_AND:              std::cout<<"and"; break;
+        // case OP_NOT:              std::cout<<"not"; break;
+        case OP_LESS:             std::cout<<"<"; break;
+        case OP_LESS_OR_EQUAL:    std::cout<<"<="; break;
+        case OP_EQUAL:            std::cout<<"="; break;
+        case OP_GREATER:          std::cout<<">"; break;
+        case OP_GREATER_OR_EQUAL: std::cout<<">="; break;
+        case OP_NOT_EQUAL:        std::cout<<"<>"; break;
+        case OP_PLUS:             std::cout<<"+"; break;
+        case OP_MINUS:            std::cout<<"-"; break;
+        case OP_MULTIPLY:         std::cout<<"*"; break;
+        case OP_DIVIDE:           std::cout<<"/"; break;
+        case OP_MOD:              std::cout<<"mod"; break;
+        default:                  std::cout<<"unknown"; break;
+    }
+    // cout << operator END
+
+    std::cout << std::endl;
+}
 
 UnaryOperatorNode::UnaryOperatorNode(
             int _line_number, 
@@ -304,7 +349,21 @@ UnaryOperatorNode::UnaryOperatorNode(
                 this->op = _op;
                 this->operand = _operand;
             }
-void UnaryOperatorNode::print() {std::cout<<"Is Hello?"<<std::endl;}
+void UnaryOperatorNode::print() {
+    std::cout << "unary operator <line: " << line_number
+        << ", col: " << col_number
+        << "> ";
+    
+    // cout << operator
+    switch(op){
+        case OP_NOT:              std::cout<<"not"; break;
+        case OP_MINUS:            std::cout<<"neg"; break;
+        default:                  std::cout<<"unknown"; break;
+    }
+    // cout << operator END
+
+    std::cout << std::endl;
+}
 
 IfNode::IfNode(
             int _line_number, 
@@ -318,7 +377,11 @@ IfNode::IfNode(
                 this->body = _body;
                 this->body_of_else = _body_of_else;
             }
-void IfNode::print() {std::cout<<"Is Hello?"<<std::endl;}
+void IfNode::print() {
+    std::cout << "if statement <line: " << line_number
+        << ", col: " << col_number
+        << ">" << std::endl;
+}
 
 WhileNode::WhileNode(
             int _line_number, 
@@ -330,7 +393,11 @@ WhileNode::WhileNode(
                 this->condition = _condition;
                 this->body = _body;
             }
-void WhileNode::print() {std::cout<<"Is Hello?"<<std::endl;}
+void WhileNode::print() {
+    std::cout << "while statement <line: " << line_number
+        << ", col: " << col_number
+        << ">" << std::endl;
+}
 
 ForNode::ForNode(
             int _line_number, 
@@ -346,7 +413,11 @@ ForNode::ForNode(
                 this->condition = _condition;
                 this->body = _body;
             }
-void ForNode::print() {std::cout<<"Is Hello?"<<std::endl;}
+void ForNode::print() {
+    std::cout << "for statement <line: " << line_number
+        << ", col: " << col_number
+        << ">" << std::endl;
+}
 
 ReturnNode::ReturnNode(
             int _line_number, 
@@ -356,7 +427,11 @@ ReturnNode::ReturnNode(
                 this->col_number = _col_number;
                 this->return_value = _return_value;
             }
-void ReturnNode::print() {std::cout<<"Is Hello?"<<std::endl;}
+void ReturnNode::print() {
+    std::cout << "return statement <line: " << line_number
+        << ", col: " << col_number
+        << ">" << std::endl;
+}
 
 FunctionCallNode::FunctionCallNode(
             int _line_number, 
@@ -368,4 +443,9 @@ FunctionCallNode::FunctionCallNode(
                 this->function_name = _function_name;
                 this->arguments = _arguments;
             }
-void FunctionCallNode::print() {std::cout<<"Is Hello?"<<std::endl;}
+void FunctionCallNode::print() {
+    std::cout << "function call statement <line: " << line_number
+        << ", col: " << col_number
+        << "> " << function_name 
+        << std::endl;
+}
