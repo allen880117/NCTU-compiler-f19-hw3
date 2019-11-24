@@ -20,6 +20,7 @@ enum enumType{
     TYPE_REAL,
     TYPE_STRING,
     TYPE_BOOLEAN,
+    TYPE_VOID,
     UNKNOWN_TYPE
 };
 
@@ -134,7 +135,9 @@ class VariableNode : public ASTNodeBase
         string variable_name;
         VariableInfo* type;
         Node constant_value_node; // constant value (zero or one)
-    
+
+        string variable_type;
+
     public:
         VariableNode(
             int _line_number, 
@@ -144,6 +147,7 @@ class VariableNode : public ASTNodeBase
             Node _constant_value_node);
         void accept(ASTVisitorBase &v) {v.visit(this); }
         void print();
+        string getType();
         ~VariableNode(){};
 };
 
@@ -175,6 +179,8 @@ class FunctionNode : public ASTNodeBase
         int  end_line_number; // function name after end
         int  end_col_number;  // function name after end
         string end_name;
+
+        vector<VariableInfo*> prototype;
     
     public:
         FunctionNode(
@@ -186,7 +192,8 @@ class FunctionNode : public ASTNodeBase
             Node _body, 
             int _end_line_number, 
             int _end_col_number, 
-            string _end_name);
+            string _end_name,
+            vector<VariableInfo*> _prototype);
         void accept(ASTVisitorBase &v) {v.visit(this); }
         void print();
 };

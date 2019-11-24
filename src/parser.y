@@ -40,6 +40,12 @@ struct id_info{
     uint32_t col_number;
 };
 
+struct NodeWithTypeList{
+    Node node;
+    VariableInfo* type;
+    uint counter;
+};
+
 static Node AST;
 
 %}
@@ -54,8 +60,11 @@ static Node AST;
 
     int    op_type;
 
-    NodeList* node_list_ptr;
     Node      node;
+    NodeList* node_list_ptr;
+
+    struct NodeWithTypeList*           node_w_type_list_ptr;
+    struct vector<NodeWithTypeList*>*  node_w_type_list_ptr_list_ptr;
 
     vector<struct id_info>* id_list_ptr;
     VariableInfo*           variable_info_ptr;
@@ -106,9 +115,9 @@ static Node AST;
 %type <node_list_ptr> Functions
 %type <node_list_ptr> FunctionList
 
-%type <node> FormalArg
-%type <node_list_ptr> FormalArgs
-%type <node_list_ptr> FormalArgList
+%type <node_w_type_list_ptr> FormalArg
+%type <node_w_type_list_ptr_list_ptr> FormalArgs
+%type <node_w_type_list_ptr_list_ptr> FormalArgList
 
 %type <node> CompoundStatement
 
@@ -206,16 +215,29 @@ FunctionDeclaration:
     CompoundStatement
     END FunctionName {
         // Function Node
+        vector<VariableInfo*> prototype;
+        NodeList* parameters = new NodeList();
+        
+        if ($3!=nullptr)
+            for(uint i=0; i<$3->size(); i++){
+                parameters->push_back((*$3)[i]->node);
+                for(uint j=0; j<(*$3)[i]->counter; j++)
+                    prototype.push_back((*$3)[i]->type);
+            }
+        else
+            parameters = nullptr;
+
         $$ = new FunctionNode(
             @1.first_line,
             @1.first_column,
             $1,
-            $3,
+            parameters,
             $5,
             $7,
             @9.first_line,
             @9.first_column,
-            $9
+            $9,
+            prototype
         );
     }
 ;
@@ -238,7 +260,7 @@ FormalArgList:
 
 FormalArgs:
     FormalArg{
-        $$ = new NodeList();
+        $$ = new vector<NodeWithTypeList*>();
         $$->push_back($1);
     }
     |
@@ -251,6 +273,10 @@ FormalArgs:
 FormalArg:
     IdList COLON Type{
         // Declaration Node (but location is not KWvar)
+        $$ = new NodeWithTypeList();
+        $$->type = $3;
+        $$->counter = 0;
+
         NodeList* var_list = new NodeList();
         for(uint i=0; i<$1->size(); i++){
             VariableNode* variable_node = new VariableNode(
@@ -261,13 +287,15 @@ FormalArg:
                 nullptr
             );
             var_list->push_back(variable_node);
+            $$->counter++;
         }
 
-        $$ = new DeclarationNode(
+        $$->node = new DeclarationNode(
             @1.first_line,
             @1.first_column,
             var_list
         );
+
     }
 ;
 
@@ -291,7 +319,7 @@ ReturnType:
     Epsilon{
         $$ = new VariableInfo;
         $$->type_set = UNKNOWN_SET;
-        $$->type = UNKNOWN_TYPE;
+        $$->type = TYPE_VOID;
     }
 ;
 
@@ -637,13 +665,14 @@ int main(int argc, const char *argv[]) {
     CHECK((argc >= 2) && (argc<=3), "Usage: ./parser <filename> [--dump-ast]\n");
     
     int isDumpNeed;
-    if(argc == 3)
+    if(argc == 3){
         isDumpNeed = strcmp(argv[2], "--dump-ast");
-    if(isDumpNeed != 0){
-        fprintf(stderr, "Usage: ./parser <filename> [--dump-ast]\n");
-        exit(-1);                                                          
+        if(isDumpNeed != 0){
+            fprintf(stderr, "Usage: ./parser <filename> [--dump-ast]\n");
+            exit(-1);                                                          
+        }
     }
-
+        
     FILE *fp = fopen(argv[1], "r");
 
     CHECK(fp != NULL, "fopen() fails.\n");

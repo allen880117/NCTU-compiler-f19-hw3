@@ -18,13 +18,57 @@ void ASTVisitor::visit(ProgramNode *m) {
                 (*(m->function_node_list))[i]->accept(*this);
             }
 
-        m->compound_statement_node->accept(*this);
+        if (m->compound_statement_node != nullptr)
+            m->compound_statement_node->accept(*this);
     this->space_counter_decrease();
 }
-void ASTVisitor::visit(DeclarationNode *m) {m->print();};
-void ASTVisitor::visit(VariableNode *m) {m->print();};
-void ASTVisitor::visit(ConstantValueNode *m) {m->print();};
-void ASTVisitor::visit(FunctionNode *m) {m->print();};
+
+void ASTVisitor::visit(DeclarationNode *m) {
+    this->print_space();
+        m->print();
+        
+    this->space_counter_increase();
+        if (m->variables_node_list != nullptr)
+            for(uint i=0; i< m->variables_node_list->size(); i++){
+                (*(m->variables_node_list))[i]->accept(*this);
+            }
+    this->space_counter_decrease();
+};
+
+void ASTVisitor::visit(VariableNode *m) {
+    this->print_space();
+        m->print();
+
+    this->space_counter_increase();
+        if (m->constant_value_node != nullptr)
+            m->constant_value_node->accept(*this);
+    this->space_counter_decrease(); 
+};
+
+void ASTVisitor::visit(ConstantValueNode *m) {
+    this->print_space();
+        m->print();
+    
+    // this->space_counter_increase();
+    // this->space_counter_decrease(); 
+};
+
+void ASTVisitor::visit(FunctionNode *m) {
+    this->print_space();
+        m->print();
+    
+    this->space_counter_increase();
+        if (m->parameters != nullptr)
+            for(uint i=0; i< m->parameters->size(); i++){
+                (*(m->parameters))[i]->accept(*this);
+            }
+        
+        if (m->body != nullptr)
+            m->body->accept(*this);
+    this->space_counter_decrease();    
+};
+
+
 void ASTVisitor::visit(CompoundStatementNode *m) {
     this->print_space();
         m->print();
@@ -32,6 +76,7 @@ void ASTVisitor::visit(CompoundStatementNode *m) {
     this->space_counter_increase();
     this->space_counter_decrease();    
 };
+
 void ASTVisitor::visit(AssignmentNode *m) {m->print();};
 void ASTVisitor::visit(PrintNode *m) {m->print();};
 void ASTVisitor::visit(ReadNode *m) {m->print();};
