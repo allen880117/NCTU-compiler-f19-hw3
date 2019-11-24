@@ -172,15 +172,15 @@ void ASTVisitor::visit(IfNode *m) {
                 (*(m->body))[i]->accept(*this);
     this->space_counter_decrease();
 
-        if (m->body_of_else != nullptr){
-            this->print_space();
-            std::cout<<"else"<<std::endl;
+    if (m->body_of_else != nullptr){
+        this->print_space();
+        std::cout<<"else"<<std::endl;
 
-            this->space_counter_increase();
-                for(uint i=0; i< m->body_of_else->size(); i++)
-                    (*(m->body_of_else))[i]->accept(*this);
-            this->space_counter_decrease();
-        }
+        this->space_counter_increase();
+            for(uint i=0; i< m->body_of_else->size(); i++)
+                (*(m->body_of_else))[i]->accept(*this);
+        this->space_counter_decrease();
+    }
 };
 
 void ASTVisitor::visit(WhileNode *m) {
