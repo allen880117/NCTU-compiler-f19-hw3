@@ -2,7 +2,7 @@
 #include "AST/program.hpp"
 
 // TODO
-void ASTVisitor::visit(ProgramNode *m) {m->print();}
+void ASTVisitor::visit(ProgramNode *m) { m->print(*this);}
 void ASTVisitor::visit(DeclarationNode *m) {m->print();};
 void ASTVisitor::visit(VariableNode *m) {m->print();};
 void ASTVisitor::visit(ConstantValueNode *m) {m->print();};

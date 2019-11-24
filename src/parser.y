@@ -1,5 +1,6 @@
 %{
 #include "include/AST/program.hpp"
+#include "include/AST/ast.hpp"
 #include "include/core/error.h"
 
 #include <stdio.h>
@@ -32,6 +33,11 @@ extern int yylex(void);
 static void yyerror(const char *msg);
 
 /* Datatype for Return Non-terminals */
+struct id_info{
+    string name;
+    int line_number;
+    int col_number;
+};
 
 static Node AST;
 
@@ -49,6 +55,9 @@ static Node AST;
 
     NodeList* node_list_ptr;
     Node      node;
+
+    vector<struct id_info>* id_list_ptr;
+    VariableType* variable_type_ptr;
 }
 
 %locations
@@ -86,14 +95,27 @@ static Node AST;
 
     /* Type of Nonterminals */
 %type <text> ProgramName
+%type <text> FunctionName
 
 %type <node> Declaration
 %type <node_list_ptr> Declarations
 %type <node_list_ptr> DeclarationList
 
+%type <node> FunctionDeclaration
+%type <node_list_ptr> Functions
 %type <node_list_ptr> FunctionList
 
+%type <node> FormalArg
+%type <node_list_ptr> FormalArgs
+%type <node_list_ptr> FormalArgList
+
 %type <node> CompoundStatement
+
+%type <id_list_ptr> IdList
+%type <variable_type_ptr> ReturnType
+%type <variable_type_ptr> Type
+%type <variable_type_ptr> ScalarType
+%type <variable_type_ptr> ArrType
 
 %%
     /*
@@ -116,7 +138,6 @@ Program:
             @7.first_column,
             $7
         );
-        printf("HELLOWORLD\n");
         AST = program_node;
     }
 ;
@@ -130,7 +151,6 @@ ProgramName:
     /*
     ProgramBody:
         DeclarationList FunctionList CompoundStatement {
-            printf("HELLOWORLD\n");
             $$->_declaration_node_list = *$1; // *(NodeList*)
             $$->_function_node_list = *$2; // *(NodeList*)
             $$->_compound_statement_node = $3; // Node
@@ -140,8 +160,7 @@ ProgramName:
 
 DeclarationList:
     Epsilon {
-        // $$ = NodeList*
-        //$$ = nullptr;
+        $$ = nullptr;
     }
     |
     Declarations {
@@ -155,7 +174,9 @@ Declarations:
     Declaration{
         // $$ = NodeList*
         // $1 = Node
-        $$->push_back($1);
+        NodeList* temp;
+        temp->push_back($1);
+        $$ = temp;
     }
     |
     Declarations Declaration{
@@ -169,53 +190,131 @@ Declarations:
 
 FunctionList:
     Epsilon{
+        $$ = nullptr;
     }
     |
-    Functions
+    Functions{
+        $$ = $1;
+    }
 ;
 
 Functions:
-    FunctionDeclaration
+    FunctionDeclaration{
+        NodeList* temp;
+        temp->push_back($1);
+        $$ = temp;
+    }
     |
-    Functions FunctionDeclaration
+    Functions FunctionDeclaration{
+        $1->push_back($2);
+        $$ = $1;
+    }
 ;
 
 FunctionDeclaration:
     FunctionName L_PARENTHESIS FormalArgList R_PARENTHESIS ReturnType SEMICOLON
     CompoundStatement
-    END FunctionName
+    END FunctionName {
+        // Function Node
+        FunctionNode* function_node = new FunctionNode(
+            @1.first_line,
+            @1.first_column,
+            $1,
+            $3,
+            $5,
+            $7,
+            @9.first_line,
+            @9.first_column,
+            $9
+        );
+        $$ = function_node;
+    }
 ;
 
 FunctionName:
-    ID
+    ID{
+        $$ = $1;
+    }
 ;
 
 FormalArgList:
-    Epsilon
+    Epsilon {
+        $$ = nullptr;
+    }
     |
-    FormalArgs
+    FormalArgs {
+        $$ = $1;
+    }
 ;
 
 FormalArgs:
-    FormalArg
+    FormalArg{
+        NodeList* temp;
+        temp->push_back($1);
+        $$ = temp;
+    }
     |
-    FormalArgs SEMICOLON FormalArg
+    FormalArgs SEMICOLON FormalArg {
+        $1->push_back($3);
+        $$ = $1;
+    }
 ;
 
 FormalArg:
-    IdList COLON Type
+    IdList COLON Type{
+        NodeList* var_list;
+        for(uint i=0; i<$1->size(); i++){
+            VariableNode* variable_node = new VariableNode(
+                (*$1)[i].line_number,
+                (*$1)[i].col_number,
+                (*$1)[i].name,
+                $3,
+                nullptr
+            );
+            var_list->push_back(variable_node);
+        }
+
+        DeclarationNode* declaration_node = new DeclarationNode(
+            @1.first_line,
+            @1.first_column,
+            var_list
+        );
+
+        $$ = declaration_node;
+    }
 ;
 
 IdList:
-    ID
+    ID{
+        vector<id_info>* temp;
+        id_info tmpInfo;
+        tmpInfo.name = $1;
+        tmpInfo.line_number = @1.first_line;
+        tmpInfo.col_number = @1.first_column;
+        temp->push_back(tmpInfo);
+        $$ = temp;
+    }
     |
-    IdList COMMA ID
+    IdList COMMA ID{
+        id_info tmpInfo;
+        tmpInfo.name = $3;
+        tmpInfo.line_number = @3.first_line;
+        tmpInfo.col_number = @3.first_column;
+        $1->push_back(tmpInfo);
+        $$ = $1;
+    }
 ;
 
 ReturnType:
-    COLON ScalarType
+    COLON ScalarType{
+        $$ = $2;
+    }
     |
-    Epsilon
+    Epsilon{
+        VariableType temp;
+        temp.type_set = UNKNOWN_SET;
+        temp.type = UNKNOWN_TYPE;
+    }
 ;
 
     /*
@@ -235,9 +334,13 @@ TypeOrConstant:
 ;
 
 Type:
-    ScalarType
+    ScalarType{
+        $$ = $1;
+    }
     |
-    ArrType
+    ArrType{
+        $$ = $1;
+    }
 ;
 
 ScalarType:
@@ -297,12 +400,13 @@ CompoundStatement:
     DeclarationList
     StatementList
     END {
-        CompoundStatementNode(
+        CompoundStatementNode* compound_statement_node = new CompoundStatementNode(
             @1.first_line, 
             @1.first_column, 
             nullptr,
             nullptr
         );
+        $$ = compound_statement_node;
     }
 ;
 
@@ -449,6 +553,11 @@ void yyerror(const char *msg) {
     exit(-1);
 }
 
+void dumpAST(ASTNodeBase* node){
+    ASTVisitor visitor;
+    node->accept(visitor);
+}
+
 int main(int argc, const char *argv[]) {
     CHECK(argc == 2, "Usage: ./parser <filename>\n");
 
@@ -458,6 +567,7 @@ int main(int argc, const char *argv[]) {
     yyin = fp;
     yyparse();
 
+    dumpAST(AST);
 
     printf("\n"
            "|--------------------------------|\n"

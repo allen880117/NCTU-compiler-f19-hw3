@@ -8,6 +8,31 @@ using namespace std;
 typedef vector< class ASTNodeBase* > NodeList;
 typedef class ASTNodeBase*           Node;
 
+enum enumTypeSet{
+    SET_SCALAR = 300,
+    SET_ACCUMLATED,
+    UNKNOWN_SET
+};
+
+enum enumType{
+    TYPE_INTEGER = 400,
+    TYPE_REAL,
+    TYPE_STRING,
+    TYPE_BOOLEAN,
+    UNKNOWN_TYPE
+};
+
+typedef struct __IntPair{
+    int start;
+    int end;
+} IntPair;
+
+typedef struct __VariableType{
+    enumTypeSet type_set;
+    enumType type;
+    vector<IntPair> ArrayRange;
+} VariableType ;
+
 class ASTVisitorBase
 {
     public:
@@ -64,7 +89,7 @@ class ProgramNode : public ASTNodeBase
             int _end_col_number, 
             string _end_name );
         void accept(ASTVisitorBase &v) {v.visit(this); }
-        void print();
+        void print(class ASTVisitorBase &v);
         ~ProgramNode();
 };
 
@@ -76,10 +101,13 @@ class DeclarationNode : public ASTNodeBase
         NodeList* variables_node_list; // Variables
     
     public:
-        DeclarationNode(int, int, NodeList*);
+        DeclarationNode(
+            int _line_number, 
+            int _col_number, 
+            NodeList* _variables_node_list);
         void accept(ASTVisitorBase &v) {v.visit(this); }
         void print();
-        ~DeclarationNode();
+        ~DeclarationNode(){};
 };
 
 class VariableNode : public ASTNodeBase
@@ -88,14 +116,19 @@ class VariableNode : public ASTNodeBase
         int  line_number; // variable name
         int  col_number;  // variable name
         string variable_name;
-        string type;
+        VariableType* type;
         Node constant_value_node; // constant value
     
     public:
-        VariableNode(int, int, string, string, Node);
+        VariableNode(
+            int _line_number, 
+            int _col_number, 
+            string _variable_name, 
+            VariableType* _type, 
+            Node _constant_value_node);
         void accept(ASTVisitorBase &v) {v.visit(this); }
         void print();
-        ~VariableNode();
+        ~VariableNode(){};
 };
 
 class ConstantValueNode : public ASTNodeBase
@@ -118,14 +151,23 @@ class FunctionNode : public ASTNodeBase
         int  col_number;  // function name
         string function_name;
         NodeList* parameters; // a list of declaration nodes
-        string return_type;
+        VariableType* return_type;
         Node body; // a compound statement node
         int  end_line_number; // function name after end
         int  end_col_number;  // function name after end
         string end_name;
     
     public:
-        FunctionNode(int, int, string, NodeList*, string, Node, int, int, string);
+        FunctionNode(
+            int _line_number, 
+            int _col_number, 
+            string _function_name, 
+            NodeList* _parameters, 
+            VariableType* _return_type, 
+            Node _body, 
+            int _end_line_number, 
+            int _end_col_number, 
+            string _end_name);
         void accept(ASTVisitorBase &v) {v.visit(this); }
         void print();
 };
