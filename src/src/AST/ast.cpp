@@ -24,17 +24,11 @@ ProgramNode::ProgramNode(
         end_col_number = _end_col_number;
         end_name = _end_name;
     }
-ProgramNode::~ProgramNode(){
-    delete compound_statement_node;
-    for(uint i=0; i<declaration_node_list->size(); i++)
-        delete (*declaration_node_list)[i];
-    for(uint i=0; i<function_node_list->size(); i++)
-        delete (*function_node_list)[i];
-    delete declaration_node_list;
-    delete function_node_list;
-}
 void ProgramNode::print() {    
-    std::cout<<"Is Hello?"<<std::endl;
+    std::cout << "program <line: " << line_number
+        << ", col: " << col_number
+        << "> " << program_name
+        << " void" << std::endl;
 }
 
 DeclarationNode::DeclarationNode(
@@ -92,7 +86,9 @@ CompoundStatementNode::CompoundStatementNode(
                 col_number=_col_number;
             }
 void CompoundStatementNode::print() {
-    std::cout<<"Is Hello?"<<std::endl;
+    std::cout << "compound statement <line: " << line_number
+        << ", col: " << col_number
+        << "> " << std::endl;
 }
 void AssignmentNode::print() {std::cout<<"Is Hello?"<<std::endl;}
 void PrintNode::print() {std::cout<<"Is Hello?"<<std::endl;}

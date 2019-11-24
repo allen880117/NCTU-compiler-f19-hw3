@@ -95,7 +95,7 @@ class ProgramNode : public ASTNodeBase
             string _end_name );
         void accept(ASTVisitorBase &v) {v.visit(this); }
         void print();
-        ~ProgramNode();
+        ~ProgramNode(){};
 };
 
 class DeclarationNode : public ASTNodeBase

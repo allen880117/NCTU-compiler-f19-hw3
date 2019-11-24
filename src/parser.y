@@ -6,6 +6,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdint.h>
+#include <cstring>
 #include <vector>
 #include <memory>
 #include <iostream>
@@ -42,7 +43,6 @@ struct id_info{
 static Node AST;
 
 %}
-
     /* Useful Header */
 %code requires { #include "include/AST/ast.hpp" }
 
@@ -559,7 +559,15 @@ void dumpAST(ASTNodeBase* node){
 }
 
 int main(int argc, const char *argv[]) {
-    CHECK(argc == 2, "Usage: ./parser <filename>\n");
+    CHECK((argc >= 2) && (argc<=3), "Usage: ./parser <filename> [--dump-ast]\n");
+    
+    int isDumpNeed;
+    if(argc == 3)
+        isDumpNeed = strcmp(argv[2], "--dump-ast");
+    if(isDumpNeed != 0){
+        fprintf(stderr, "Usage: ./parser <filename> [--dump-ast]\n");
+        exit(-1);                                                          
+    }
 
     FILE *fp = fopen(argv[1], "r");
 
@@ -567,7 +575,8 @@ int main(int argc, const char *argv[]) {
     yyin = fp;
     yyparse();
 
-    dumpAST(AST);
+    if(argc == 3 && isDumpNeed == 0)
+        dumpAST(AST);
 
     printf("\n"
            "|--------------------------------|\n"
