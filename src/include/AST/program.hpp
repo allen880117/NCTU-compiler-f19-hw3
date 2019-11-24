@@ -53,6 +53,11 @@ class ASTVisitorBase
         virtual void visit(class ForNode *node) = 0;
         virtual void visit(class ReturnNode *node) = 0;
         virtual void visit(class FunctionCallNode *node) = 0;
+
+        uint space_counter = 0;
+        void space_counter_increase();
+        void space_counter_decrease();
+        void print_space();
 };
 
 class ASTNodeBase
@@ -106,7 +111,7 @@ class DeclarationNode : public ASTNodeBase
             int _col_number, 
             NodeList* _variables_node_list);
         void accept(ASTVisitorBase &v) {v.visit(this); }
-        void print();
+        void print(class ASTVisitorBase &v);
         ~DeclarationNode(){};
 };
 
@@ -127,7 +132,7 @@ class VariableNode : public ASTNodeBase
             VariableType* _type, 
             Node _constant_value_node);
         void accept(ASTVisitorBase &v) {v.visit(this); }
-        void print();
+        void print(class ASTVisitorBase &v);
         ~VariableNode(){};
 };
 
@@ -141,7 +146,7 @@ class ConstantValueNode : public ASTNodeBase
     public:
         ConstantValueNode(int, int, string);
         void accept(ASTVisitorBase &v) {v.visit(this); }
-        void print();
+        void print(class ASTVisitorBase &v);
 };
 
 class FunctionNode : public ASTNodeBase
@@ -169,7 +174,7 @@ class FunctionNode : public ASTNodeBase
             int _end_col_number, 
             string _end_name);
         void accept(ASTVisitorBase &v) {v.visit(this); }
-        void print();
+        void print(class ASTVisitorBase &v);
 };
 
 class CompoundStatementNode : public ASTNodeBase
@@ -187,7 +192,7 @@ class CompoundStatementNode : public ASTNodeBase
             NodeList* _declaration_node_list, 
             NodeList* _statement_node_list);
         void accept(ASTVisitorBase &v) {v.visit(this); }
-        void print();
+        void print(class ASTVisitorBase &v);
 };
 
 class AssignmentNode : public ASTNodeBase
@@ -201,7 +206,7 @@ class AssignmentNode : public ASTNodeBase
     public:
         AssignmentNode(int, int, Node, Node);
         void accept(ASTVisitorBase &v) {v.visit(this); }
-        void print();
+        void print(class ASTVisitorBase &v);
 };
 
 class PrintNode : public ASTNodeBase
@@ -214,7 +219,7 @@ class PrintNode : public ASTNodeBase
     public:
         PrintNode(int, int, Node);
         void accept(ASTVisitorBase &v) {v.visit(this); }
-        void print();
+        void print(class ASTVisitorBase &v);
 };
 
 class ReadNode : public ASTNodeBase
@@ -227,7 +232,7 @@ class ReadNode : public ASTNodeBase
     public:
         ReadNode(int, int, Node);
         void accept(ASTVisitorBase &v) {v.visit(this); }
-        void print();
+        void print(class ASTVisitorBase &v);
 };
 
 class VariableReferenceNode : public ASTNodeBase
@@ -241,7 +246,7 @@ class VariableReferenceNode : public ASTNodeBase
     public:
         VariableReferenceNode(int, int, string, NodeList*);
         void accept(ASTVisitorBase &v) {v.visit(this); }
-        void print();
+        void print(class ASTVisitorBase &v);
 };
 
 class BinaryOperatorNode : public ASTNodeBase
@@ -256,7 +261,7 @@ class BinaryOperatorNode : public ASTNodeBase
     public:
         BinaryOperatorNode(int, int, string, Node, Node);
         void accept(ASTVisitorBase &v) {v.visit(this); }
-        void print();
+        void print(class ASTVisitorBase &v);
 };
 
 class UnaryOperatorNode : public ASTNodeBase
@@ -270,7 +275,7 @@ class UnaryOperatorNode : public ASTNodeBase
     public:
         UnaryOperatorNode(int, int, string, Node);
         void accept(ASTVisitorBase &v) {v.visit(this); }
-        void print();
+        void print(class ASTVisitorBase &v);
 };
 
 class IfNode : public ASTNodeBase
@@ -285,7 +290,7 @@ class IfNode : public ASTNodeBase
     public:
         IfNode(int, int, Node, NodeList*, NodeList*);
         void accept(ASTVisitorBase &v) {v.visit(this); }
-        void print();
+        void print(class ASTVisitorBase &v);
 };
 
 class WhileNode : public ASTNodeBase
@@ -299,7 +304,7 @@ class WhileNode : public ASTNodeBase
     public:
         WhileNode(int, int, Node, NodeList*);
         void accept(ASTVisitorBase &v) {v.visit(this); }
-        void print();
+        void print(class ASTVisitorBase &v);
 };
 
 class ForNode : public ASTNodeBase
@@ -315,7 +320,7 @@ class ForNode : public ASTNodeBase
     public:
         ForNode(int, int, Node, Node, Node, NodeList*);
         void accept(ASTVisitorBase &v) {v.visit(this); }
-        void print();
+        void print(class ASTVisitorBase &v);
 };
 
 class ReturnNode : public ASTNodeBase
@@ -328,7 +333,7 @@ class ReturnNode : public ASTNodeBase
     public:
         ReturnNode(int, int, Node);
         void accept(ASTVisitorBase &v) {v.visit(this); }
-        void print();
+        void print(class ASTVisitorBase &v);
 };
 
 class FunctionCallNode : public ASTNodeBase
@@ -342,5 +347,5 @@ class FunctionCallNode : public ASTNodeBase
     public:
         FunctionCallNode(int, int, string, NodeList*);
         void accept(ASTVisitorBase &v) {v.visit(this); }
-        void print();
+        void print(class ASTVisitorBase &v);
 };
