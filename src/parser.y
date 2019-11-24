@@ -58,7 +58,7 @@ static Node AST;
     double dval;
     char*  text;
 
-    int    op_type;
+    enum enumOperator op_type;
 
     Node      node;
     NodeList* node_list_ptr;
@@ -78,13 +78,13 @@ static Node AST;
 %token L_BRACKET R_BRACKET
 
     /* Operator */
-%token ASSIGN
-%left OR
-%left AND
-%right NOT
-%left LESS LESS_OR_EQUAL EQUAL GREATER GREATER_OR_EQUAL NOT_EQUAL
-%left PLUS MINUS
-%left MULTIPLY DIVIDE MOD
+%token <op_type> ASSIGN
+%left <op_type> OR
+%left <op_type> AND
+%right <op_type> NOT
+%left <op_type> LESS LESS_OR_EQUAL EQUAL GREATER GREATER_OR_EQUAL NOT_EQUAL
+%left <op_type> PLUS MINUS
+%left <op_type> MULTIPLY DIVIDE MOD
 %right UNARY_MINUS
 
     /* Keyword */
@@ -119,6 +119,27 @@ static Node AST;
 %type <node_w_type_list_ptr_list_ptr> FormalArgs
 %type <node_w_type_list_ptr_list_ptr> FormalArgList
 
+%type <node> Statement
+%type <node_list_ptr> Statements
+%type <node_list_ptr> StatementList
+
+%type <node> Expression
+%type <node_list_ptr> Expressions
+%type <node_list_ptr> ExpressionList
+
+%type <node> VariableReference
+%type <node_list_ptr> ArrForm
+
+%type <node> Condition
+%type <node_list_ptr> ElseOrNot
+
+%type <node> While
+%type <node> For
+%type <node> Return
+%type <node> FunctionInvokation
+%type <node> FunctionCall
+
+%type <node> Simple
 %type <node> CompoundStatement
 
 %type <id_list_ptr> IdList
@@ -483,19 +504,33 @@ LiteralConstant:
                   */
 
 Statement:
-    CompoundStatement
+    CompoundStatement{
+        $$ = $1;
+    }
     |
-    Simple
+    Simple{
+        $$ = $1;
+    }
     |
-    Condition
+    Condition{
+        $$ = $1;
+    }
     |
-    While
+    While{
+        $$ = $1;
+    }
     |
-    For
+    For{
+        $$ = $1;
+    }
     |
-    Return
+    Return{
+        $$ = $1;
+    }
     |
-    FunctionInvokation
+    FunctionInvokation{
+        $$ = $1;
+    }
 ;
 
 CompoundStatement:
@@ -503,136 +538,451 @@ CompoundStatement:
     DeclarationList
     StatementList
     END {
-        CompoundStatementNode* compound_statement_node = new CompoundStatementNode(
+        // Compound Statement Node
+        $$ = new CompoundStatementNode(
             @1.first_line, 
             @1.first_column, 
-            nullptr,
-            nullptr
+            $2,
+            $3
         );
-        $$ = compound_statement_node;
     }
 ;
 
 Simple:
-    VariableReference ASSIGN Expression SEMICOLON
+    VariableReference ASSIGN Expression SEMICOLON{
+        // Assignment Node
+        $$ = new AssignmentNode(
+            @2.first_line,
+            @2.first_column,
+            $1,
+            $3
+        );
+    }
     |
-    PRINT Expression SEMICOLON
+    PRINT Expression SEMICOLON{
+        // Print Node
+        $$ = new PrintNode(
+            @1.first_line,
+            @1.first_column,
+            $2
+        );
+    }
     |
-    READ VariableReference SEMICOLON
+    READ VariableReference SEMICOLON{
+        // Read Node
+        $$ = new ReadNode(
+            @1.first_line,
+            @1.first_column,
+            $2  
+        );
+    }
 ;
 
 VariableReference:
-    ID
+    ID{
+        // Variable Reference Node
+        $$ = new VariableReferenceNode(
+            @1.first_line,
+            @1.first_column,
+            $1,
+            nullptr
+        );
+    }
     |
-    ID ArrForm
+    ID ArrForm{
+        $$ = new VariableReferenceNode(
+            @1.first_line,
+            @1.first_column,
+            $1,
+            $2
+        );
+    }
 ;
 
 ArrForm:
-    L_BRACKET Expression R_BRACKET
+    L_BRACKET Expression R_BRACKET{
+        $$ = new NodeList();
+        $$->push_back($2);
+    }
     |
-    ArrForm L_BRACKET Expression R_BRACKET
+    ArrForm L_BRACKET Expression R_BRACKET{
+        $1->push_back($3);
+        $$ = $1;
+    }
 ;
 
 Condition:
     IF Expression THEN
     StatementList
     ElseOrNot
-    END IF
+    END IF {
+        // If Node
+        $$ = new IfNode(
+            @1.first_line,
+            @1.first_column,
+            $2,
+            $4,
+            $5
+        );
+    }
 ;
 
 ElseOrNot:
     ELSE
-    StatementList
+    StatementList{
+        $$ = $2;
+    }
     |
-    Epsilon
+    Epsilon{
+        $$ = nullptr;
+    }
 ;
 
 While:
     WHILE Expression DO
     StatementList
-    END DO
+    END DO {
+        // While Node
+        $$ = new WhileNode(
+            @1.first_line,
+            @1.first_column,
+            $2,
+            $4
+        );
+    }
 ;
 
 For:
     FOR ID ASSIGN INT_LITERAL TO INT_LITERAL DO
     StatementList
-    END DO
+    END DO {
+        // loop_variable_declaration : a declaration node
+        VariableInfo* var_info = new VariableInfo();
+        var_info->type_set = SET_SCALAR;
+        var_info->type = TYPE_INTEGER;
+        VariableNode* variable_node = new VariableNode(
+            @2.first_line,
+            @2.first_column,
+            $2,
+            var_info,
+            nullptr
+        );
+
+        NodeList* var_list = new NodeList();
+        var_list->push_back(variable_node);
+        DeclarationNode* declaration_node = new DeclarationNode(
+            @2.first_line,
+            @2.first_column,
+            var_list
+        );
+
+        // initial: an assignment node
+        VariableReferenceNode* variable_reference_node = new VariableReferenceNode(
+            @2.first_line,
+            @2.first_column,
+            $2,
+            nullptr
+        );
+
+        VariableInfo* constant_value_info = new VariableInfo();
+        constant_value_info->type_set = SET_CONSTANT_LITERAL;
+        constant_value_info->type = TYPE_INTEGER;
+        constant_value_info->int_literal = $4;
+        ConstantValueNode* constant_value_node = new ConstantValueNode(
+            @4.first_line,
+            @4.first_column,
+            constant_value_info
+        );
+
+        AssignmentNode* assignment_node = new AssignmentNode(
+            @3.first_line,
+            @3.first_column,
+            variable_reference_node,
+            constant_value_node // expression node
+        );
+
+        // condition: an expression node ( constant value node )
+        VariableInfo* constant_value_info2 = new VariableInfo();
+        constant_value_info2->type_set = SET_CONSTANT_LITERAL;
+        constant_value_info2->type = TYPE_INTEGER;
+        constant_value_info2->int_literal = $6;
+        ConstantValueNode* constant_value_node2 = new ConstantValueNode(
+            @6.first_line,
+            @6.first_column,
+            constant_value_info2
+        );
+
+        // For Node
+        $$ = new ForNode(
+            @1.first_line,
+            @1.first_column,
+            declaration_node,
+            assignment_node,
+            constant_value_node2, // expression node
+            $8
+        );
+    }
 ;
 
 Return:
-    RETURN Expression SEMICOLON
+    RETURN Expression SEMICOLON {
+        // Return Node
+        $$ = new ReturnNode(
+            @1.first_line,
+            @1.first_column,
+            $2
+        );
+    }
 ;
 
 FunctionInvokation:
-    FunctionCall SEMICOLON
+    FunctionCall SEMICOLON {
+        $$ = $1;
+    }
 ;
 
 FunctionCall:
-    ID L_PARENTHESIS ExpressionList R_PARENTHESIS
+    ID L_PARENTHESIS ExpressionList R_PARENTHESIS {
+        // Function Call Node
+        $$ = new FunctionCallNode(
+            @1.first_line,
+            @1.first_column,
+            $1,
+            $3
+        );
+    }
 ;
 
 ExpressionList:
-    Epsilon
+    Epsilon{
+        $$ = nullptr;
+    }
     |
-    Expressions
+    Expressions{
+        $$ = $1;
+    }
 ;
 
 Expressions:
-    Expression
+    Expression{
+        $$ = new NodeList();
+        $$->push_back($1);
+    }
     |
-    Expressions COMMA Expression
+    Expressions COMMA Expression{
+        $1->push_back($3);
+        $$=$1;
+    }
 ;
 
 StatementList:
-    Epsilon
+    Epsilon{
+        $$ = nullptr;
+    }
     |
-    Statements
+    Statements{
+        $$ = $1;
+    }
 ;
 
 Statements:
-    Statement
+    Statement{
+        $$ = new NodeList();
+        $$->push_back($1);
+    }
     |
-    Statements Statement
+    Statements Statement{
+        $1->push_back($2);
+        $$=$1;
+    }
 ;
 
 Expression:
-    L_PARENTHESIS Expression R_PARENTHESIS
+    L_PARENTHESIS Expression R_PARENTHESIS{
+        $$ = $2;
+    }
     |
-    MINUS Expression %prec UNARY_MINUS
+    MINUS Expression %prec UNARY_MINUS{
+        // Unary Operator Node
+        $$ = new UnaryOperatorNode(
+            @1.first_line,
+            @1.first_column,
+            $1,
+            $2
+        );
+    }
     |
-    Expression MULTIPLY Expression
+    Expression MULTIPLY Expression{
+        // Binary Operator Node
+        $$ = new BinaryOperatorNode(
+            @2.first_line,
+            @2.first_column,
+            $2,
+            $1,
+            $3
+        );
+    }
     |
-    Expression DIVIDE Expression
+    Expression DIVIDE Expression{
+        // Binary Operator Node
+        $$ = new BinaryOperatorNode(
+            @2.first_line,
+            @2.first_column,
+            $2,
+            $1,
+            $3
+        );
+    }
     |
-    Expression MOD Expression
+    Expression MOD Expression{
+        // Binary Operator Node
+        $$ = new BinaryOperatorNode(
+            @2.first_line,
+            @2.first_column,
+            $2,
+            $1,
+            $3
+        );
+    }
     |
-    Expression PLUS Expression
+    Expression PLUS Expression{
+        // Binary Operator Node
+        $$ = new BinaryOperatorNode(
+            @2.first_line,
+            @2.first_column,
+            $2,
+            $1,
+            $3
+        );
+    }
     |
-    Expression MINUS Expression
+    Expression MINUS Expression{
+        // Binary Operator Node
+        $$ = new BinaryOperatorNode(
+            @2.first_line,
+            @2.first_column,
+            $2,
+            $1,
+            $3
+        );
+    }
     |
-    Expression LESS Expression
+    Expression LESS Expression{
+        // Binary Operator Node
+        $$ = new BinaryOperatorNode(
+            @2.first_line,
+            @2.first_column,
+            $2,
+            $1,
+            $3
+        );
+    }
     |
-    Expression LESS_OR_EQUAL Expression
+    Expression LESS_OR_EQUAL Expression{
+        // Binary Operator Node
+        $$ = new BinaryOperatorNode(
+            @2.first_line,
+            @2.first_column,
+            $2,
+            $1,
+            $3
+        );
+    }
     |
-    Expression GREATER Expression
+    Expression GREATER Expression{
+        // Binary Operator Node
+        $$ = new BinaryOperatorNode(
+            @2.first_line,
+            @2.first_column,
+            $2,
+            $1,
+            $3
+        );
+    }
     |
-    Expression GREATER_OR_EQUAL Expression
+    Expression GREATER_OR_EQUAL Expression{
+        // Binary Operator Node
+        $$ = new BinaryOperatorNode(
+            @2.first_line,
+            @2.first_column,
+            $2,
+            $1,
+            $3
+        );
+    }
     |
-    Expression EQUAL Expression
+    Expression EQUAL Expression{
+        // Binary Operator Node
+        $$ = new BinaryOperatorNode(
+            @2.first_line,
+            @2.first_column,
+            $2,
+            $1,
+            $3
+        );
+    }
     |
-    Expression NOT_EQUAL Expression
+    Expression NOT_EQUAL Expression{
+        // Binary Operator Node
+        $$ = new BinaryOperatorNode(
+            @2.first_line,
+            @2.first_column,
+            $2,
+            $1,
+            $3
+        );
+    }
     |
-    NOT Expression
+    NOT Expression{
+        // Unary Operator Node
+        $$ = new UnaryOperatorNode(
+            @1.first_line,
+            @1.first_column,
+            $1,
+            $2
+        );
+    }
     |
-    Expression AND Expression
+    Expression AND Expression{
+        // Binary Operator Node
+        $$ = new BinaryOperatorNode(
+            @2.first_line,
+            @2.first_column,
+            $2,
+            $1,
+            $3
+        );
+    }
     |
-    Expression OR Expression
+    Expression OR Expression{
+        // Binary Operator Node
+        $$ = new BinaryOperatorNode(
+            @2.first_line,
+            @2.first_column,
+            $2,
+            $1,
+            $3
+        );
+    }
     |
-    LiteralConstant
+    LiteralConstant{
+        // Constant Value Node
+        $$ = new ConstantValueNode(
+            @1.first_line,
+            @1.first_column,
+            $1
+        );
+    }
     |
-    VariableReference
+    VariableReference{
+        // Variable Reference Node
+        $$ = $1;
+    }
     |
-    FunctionCall
+    FunctionCall{
+        // Function Call Node
+        $$ = $1;
+    }
 ;
 
     /*

@@ -182,8 +182,7 @@ void FunctionNode::print() {
             break;
         default: std::cout<<"unknown"; break; break;
     }
-    // cout << return_type
-  
+    // cout << return_type END
 
     // cout << parameter_prototype
     std::cout<<" (";
@@ -219,7 +218,7 @@ void FunctionNode::print() {
             }
         }
     std::cout<<")";
-    // cout << parameter_prototype
+    // cout << parameter_prototype END
     std::cout<<std::endl;
 }
 
@@ -236,14 +235,137 @@ void CompoundStatementNode::print() {
         << ", col: " << col_number
         << "> " << std::endl;
 }
+
+AssignmentNode::AssignmentNode(
+            int _line_number, 
+            int _col_nubmer, 
+            Node _variable_reference_node, 
+            Node _expression_node){
+                this->line_number = _line_number;
+                this->col_number = _col_nubmer;
+                this->variable_reference_node = _variable_reference_node;
+                this->expression_node = _expression_node;
+            }
 void AssignmentNode::print() {std::cout<<"Is Hello?"<<std::endl;}
+
+PrintNode::PrintNode(
+            int _line_number, 
+            int _col_number, 
+            Node _expression_node){
+                this->line_number = _line_number;
+                this->col_number = _col_number;
+                this->expression_node = _expression_node;
+            }
 void PrintNode::print() {std::cout<<"Is Hello?"<<std::endl;}
+
+ReadNode::ReadNode(
+            int _line_number, 
+            int _col_number, 
+            Node _variable_reference_node){
+                this->line_number = _line_number;
+                this->col_number = _col_number;
+                this->variable_reference_node = _variable_reference_node;
+            }
 void ReadNode::print() {std::cout<<"Is Hello?"<<std::endl;}
+
+VariableReferenceNode::VariableReferenceNode(
+            int _line_number, 
+            int _col_number, 
+            string _variable_name, 
+            NodeList* _expression_node_list){
+                this->line_number = _line_number;
+                this->col_number = _col_number;
+                this->variable_name = _variable_name;
+                this->expression_node_list = _expression_node_list;
+            }
 void VariableReferenceNode::print() {std::cout<<"Is Hello?"<<std::endl;}
+
+BinaryOperatorNode::BinaryOperatorNode(
+            int _line_number, 
+            int _col_number, 
+            enumOperator _op, 
+            Node _left_operand, 
+            Node _right_operand){
+                this->line_number = _line_number;
+                this->col_number = _col_number;
+                this->op = _op;
+                this->left_operand = _left_operand;
+                this->right_operand = _right_operand;
+            }
 void BinaryOperatorNode::print() {std::cout<<"Is Hello?"<<std::endl;}
+
+UnaryOperatorNode::UnaryOperatorNode(
+            int _line_number, 
+            int _col_number, 
+            enumOperator _op, 
+            Node _operand){
+                this->line_number = _line_number;
+                this->col_number = _col_number;
+                this->op = _op;
+                this->operand = _operand;
+            }
 void UnaryOperatorNode::print() {std::cout<<"Is Hello?"<<std::endl;}
+
+IfNode::IfNode(
+            int _line_number, 
+            int _col_number, 
+            Node _condition, 
+            NodeList* _body, 
+            NodeList* _body_of_else){
+                this->line_number = _line_number;
+                this->col_number = _col_number;
+                this->condition = _condition;
+                this->body = _body;
+                this->body_of_else = _body_of_else;
+            }
 void IfNode::print() {std::cout<<"Is Hello?"<<std::endl;}
+
+WhileNode::WhileNode(
+            int _line_number, 
+            int _col_number, 
+            Node _condition, 
+            NodeList* _body){
+                this->line_number = _line_number;
+                this->col_number = _col_number;
+                this->condition = _condition;
+                this->body = _body;
+            }
 void WhileNode::print() {std::cout<<"Is Hello?"<<std::endl;}
+
+ForNode::ForNode(
+            int _line_number, 
+            int _col_number, 
+            Node _loop_variable_declaration, 
+            Node _initial_statement, 
+            Node _condition, 
+            NodeList* _body){
+                this->line_number = _line_number;
+                this->col_number = _col_number;
+                this->loop_variable_declaration = _loop_variable_declaration;
+                this->initial_statement = _initial_statement;
+                this->condition = _condition;
+                this->body = _body;
+            }
 void ForNode::print() {std::cout<<"Is Hello?"<<std::endl;}
+
+ReturnNode::ReturnNode(
+            int _line_number, 
+            int _col_number, 
+            Node _return_value){
+                this->line_number = _line_number;
+                this->col_number = _col_number;
+                this->return_value = _return_value;
+            }
 void ReturnNode::print() {std::cout<<"Is Hello?"<<std::endl;}
+
+FunctionCallNode::FunctionCallNode(
+            int _line_number, 
+            int _col_number, 
+            string _function_name, 
+            NodeList* _arguments){
+                this->line_number = _line_number;
+                this->col_number = _col_number;
+                this->function_name = _function_name;
+                this->arguments = _arguments;
+            }
 void FunctionCallNode::print() {std::cout<<"Is Hello?"<<std::endl;}

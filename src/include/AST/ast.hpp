@@ -8,6 +8,25 @@ using namespace std;
 typedef vector< class ASTNodeBase* > NodeList;
 typedef class ASTNodeBase*           Node;
 
+enum enumOperator{
+    OP_ASSIGN = 500,
+    OP_OR,
+    OP_AND,
+    OP_NOT,
+    OP_LESS,
+    OP_LESS_OR_EQUAL,
+    OP_EQUAL,
+    OP_GREATER,
+    OP_GREATER_OR_EQUAL,
+    OP_NOT_EQUAL,
+    OP_PLUS,
+    OP_MINUS,
+    OP_MULTIPLY,
+    OP_DIVIDE,
+    OP_MOD,
+    UNKNOWN_OP
+};
+
 enum enumTypeSet{
     SET_SCALAR = 300,
     SET_ACCUMLATED,
@@ -225,7 +244,11 @@ class AssignmentNode : public ASTNodeBase
         Node expression_node; // Expression
 
     public:
-        AssignmentNode(int, int, Node, Node);
+        AssignmentNode(
+            int _line_number, 
+            int _col_nubmer, 
+            Node _variable_reference_node, 
+            Node _expression_node);
         void accept(ASTVisitorBase &v) {v.visit(this); }
         void print();
 };
@@ -238,7 +261,10 @@ class PrintNode : public ASTNodeBase
         Node expression_node; // Target
 
     public:
-        PrintNode(int, int, Node);
+        PrintNode(
+            int _line_number, 
+            int _col_number, 
+            Node _expression_node);
         void accept(ASTVisitorBase &v) {v.visit(this); }
         void print();
 };
@@ -251,7 +277,10 @@ class ReadNode : public ASTNodeBase
         Node variable_reference_node; // Target
 
     public:
-        ReadNode(int, int, Node);
+        ReadNode(
+            int _line_number, 
+            int _col_number, 
+            Node _variable_reference_node);
         void accept(ASTVisitorBase &v) {v.visit(this); }
         void print();
 };
@@ -265,7 +294,11 @@ class VariableReferenceNode : public ASTNodeBase
         NodeList* expression_node_list; // indices
 
     public:
-        VariableReferenceNode(int, int, string, NodeList*);
+        VariableReferenceNode(
+            int _line_number, 
+            int _col_number, 
+            string _variable_name, 
+            NodeList* _expression_node_list);
         void accept(ASTVisitorBase &v) {v.visit(this); }
         void print();
 };
@@ -275,12 +308,17 @@ class BinaryOperatorNode : public ASTNodeBase
     public:
         int  line_number; // operator
         int  col_number;  // operator
-        string op;
+        enumOperator op;
         Node left_operand; // an expression node
         Node right_operand; // an expression node
 
     public:
-        BinaryOperatorNode(int, int, string, Node, Node);
+        BinaryOperatorNode(
+            int _line_number, 
+            int _col_number, 
+            enumOperator _op, 
+            Node _left_operand, 
+            Node _right_operand);
         void accept(ASTVisitorBase &v) {v.visit(this); }
         void print();
 };
@@ -290,11 +328,15 @@ class UnaryOperatorNode : public ASTNodeBase
     public:
         int  line_number; // operator
         int  col_number;  // operator
-        string op;
+        enumOperator op;
         Node operand; // an expression node
 
     public:
-        UnaryOperatorNode(int, int, string, Node);
+        UnaryOperatorNode(
+            int _line_number, 
+            int _col_number, 
+            enumOperator _op, 
+            Node _operand);
         void accept(ASTVisitorBase &v) {v.visit(this); }
         void print();
 };
@@ -309,7 +351,12 @@ class IfNode : public ASTNodeBase
         NodeList* body_of_else; // a list of statement nodes (zero or more)
 
     public:
-        IfNode(int, int, Node, NodeList*, NodeList*);
+        IfNode(
+            int _line_number, 
+            int _col_number, 
+            Node _condition, 
+            NodeList* _body, 
+            NodeList* _body_of_else);
         void accept(ASTVisitorBase &v) {v.visit(this); }
         void print();
 };
@@ -323,7 +370,11 @@ class WhileNode : public ASTNodeBase
         NodeList* body; // a list of statement nodes (zero or more)
 
     public:
-        WhileNode(int, int, Node, NodeList*);
+        WhileNode(
+            int _line_number, 
+            int _col_number, 
+            Node _condition, 
+            NodeList* _body);
         void accept(ASTVisitorBase &v) {v.visit(this); }
         void print();
 };
@@ -333,13 +384,19 @@ class ForNode : public ASTNodeBase
     public:
         int  line_number; // for
         int  col_number;  // for
-        Node loop_variable_declaration; // an declaration node
+        Node loop_variable_declaration; // a declaration node
         Node initial_statement; // an assignment node
         Node condition; // an expression node
         NodeList* body; // a list of statement nodes (zero or more)
 
     public:
-        ForNode(int, int, Node, Node, Node, NodeList*);
+        ForNode(
+            int _line_number, 
+            int _col_number, 
+            Node _loop_variable_declaration, 
+            Node _initial_statement, 
+            Node _condition, 
+            NodeList* _body);
         void accept(ASTVisitorBase &v) {v.visit(this); }
         void print();
 };
@@ -352,7 +409,10 @@ class ReturnNode : public ASTNodeBase
         Node return_value; // an expression node
 
     public:
-        ReturnNode(int, int, Node);
+        ReturnNode(
+            int _line_number, 
+            int _col_number, 
+            Node _return_value);
         void accept(ASTVisitorBase &v) {v.visit(this); }
         void print();
 };
@@ -366,7 +426,11 @@ class FunctionCallNode : public ASTNodeBase
         NodeList* arguments; // a list of expression nodes (zero ro more);
 
     public:
-        FunctionCallNode(int, int, string, NodeList*);
+        FunctionCallNode(
+            int _line_number, 
+            int _col_number, 
+            string _function_name, 
+            NodeList* _arguments);
         void accept(ASTVisitorBase &v) {v.visit(this); }
         void print();
 };
