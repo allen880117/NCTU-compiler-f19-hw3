@@ -161,8 +161,8 @@ function declaration <line: <line_number>, col: <col_number>> <function_name> <f
 ```C#
 function declaration <line: 26, col: 1> func5 void (integer, string)
   declaration <line: 26, col: 7>
-    variable <line: 26, col: 7> b real
-    variable <line: 26, col: 10> c real
+    variable <line: 26, col: 7> b integer
+    variable <line: 26, col: 10> c string
   compound statement <line: 27, col: 1>
 ```
 
@@ -467,10 +467,8 @@ for statement <line: 28, col: 3>
     variable <line: 28, col: 7> idx integer
   assignment statement <line: 28, col: 11>
     variable reference <line: 28, col: 7> idx
-    expression <line: 28, col: 14>
-      constant <line: 28, col: 14> 0
-  expression <line: 28, col: 19>
-    constant <line: 28, col: 19> 10
+    constant <line: 28, col: 14> 0
+  constant <line: 28, col: 19> 10
   compound statement <line: 29, col: 5>
     declaration <line: 30, col: 7>
       variable <line: 30, col: 11> idx integer
