@@ -1,5 +1,22 @@
 %{
 #include "include/AST/ast.hpp"
+#include "include/AST/program.hpp"
+#include "include/AST/declaration.hpp"
+#include "include/AST/variable.hpp"
+#include "include/AST/constant_value.hpp"
+#include "include/AST/function.hpp"
+#include "include/AST/compound_statement.hpp"
+#include "include/AST/assignment.hpp"
+#include "include/AST/print.hpp"
+#include "include/AST/read.hpp"
+#include "include/AST/variable_reference.hpp"
+#include "include/AST/binary_operator.hpp"
+#include "include/AST/unary_operator.hpp"
+#include "include/AST/if.hpp"
+#include "include/AST/while.hpp"
+#include "include/AST/for.hpp"
+#include "include/AST/return.hpp"
+#include "include/AST/function_call.hpp"
 #include "include/visitor/visitor.hpp"
 #include "include/core/error.h"
 
@@ -51,6 +68,24 @@ static Node AST;
 %}
     /* Useful Header */
 %code requires { #include "include/AST/ast.hpp" }
+%code requires { #include "include/AST/program.hpp" }
+%code requires { #include "include/AST/declaration.hpp" }
+%code requires { #include "include/AST/variable.hpp" }
+%code requires { #include "include/AST/constant_value.hpp" }
+%code requires { #include "include/AST/function.hpp" }
+%code requires { #include "include/AST/compound_statement.hpp" }
+%code requires { #include "include/AST/assignment.hpp" }
+%code requires { #include "include/AST/print.hpp" }
+%code requires { #include "include/AST/read.hpp" }
+%code requires { #include "include/AST/variable_reference.hpp" }
+%code requires { #include "include/AST/binary_operator.hpp" }
+%code requires { #include "include/AST/unary_operator.hpp" }
+%code requires { #include "include/AST/if.hpp" }
+%code requires { #include "include/AST/while.hpp" }
+%code requires { #include "include/AST/for.hpp" }
+%code requires { #include "include/AST/return.hpp" }
+%code requires { #include "include/AST/function_call.hpp" }
+%code requires { #include "include/visitor/visitor.hpp" }
 
     /* Union Define */
 %union {
