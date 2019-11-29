@@ -29,6 +29,7 @@ class FunctionNode : public ASTNodeBase
             int _end_col_number, 
             string _end_name,
             vector<VariableInfo*> _prototype);
+        ~FunctionNode();
         void accept(ASTVisitorBase &v) {v.visit(this); }
         void print();
 };

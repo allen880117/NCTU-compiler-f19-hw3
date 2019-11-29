@@ -14,7 +14,7 @@ class DeclarationNode : public ASTNodeBase
             int _line_number, 
             int _col_number, 
             NodeList* _variables_node_list);
+        ~DeclarationNode();
         void accept(ASTVisitorBase &v) {v.visit(this); }
         void print();
-        ~DeclarationNode(){};
 };

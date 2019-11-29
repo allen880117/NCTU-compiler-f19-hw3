@@ -14,6 +14,7 @@ class PrintNode : public ASTNodeBase
             int _line_number, 
             int _col_number, 
             Node _expression_node);
+        ~PrintNode();
         void accept(ASTVisitorBase &v) {v.visit(this); }
         void print();
 };

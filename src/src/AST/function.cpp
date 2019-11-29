@@ -5,26 +5,37 @@
 #include <string>
 
 FunctionNode::FunctionNode(
-            int _line_number, 
-            int _col_number, 
-            string _function_name, 
-            NodeList* _parameters, 
-            VariableInfo* _return_type, 
-            Node _body, 
-            int _end_line_number, 
-            int _end_col_number, 
-            string _end_name,
-            vector<VariableInfo*> _prototype){
-                this->line_number = _line_number;
-                this->col_number = _col_number;
-                this->function_name = _function_name;
-                this->parameters = _parameters;
-                this->return_type = _return_type;
-                this->body = _body;
-                this->end_line_number = _end_line_number;
-                this->end_col_number = _end_col_number;
-                this->prototype = _prototype;
-            }
+    int _line_number, 
+    int _col_number, 
+    string _function_name, 
+    NodeList* _parameters, 
+    VariableInfo* _return_type, 
+    Node _body, 
+    int _end_line_number, 
+    int _end_col_number, 
+    string _end_name,
+    vector<VariableInfo*> _prototype
+    ){
+        this->line_number = _line_number;
+        this->col_number = _col_number;
+        this->function_name = _function_name;
+        this->parameters = _parameters;
+        this->return_type = _return_type;
+        this->body = _body;
+        this->end_line_number = _end_line_number;
+        this->end_col_number = _end_col_number;
+        this->prototype = _prototype;
+    }
+
+FunctionNode::~FunctionNode(){
+    NODELIST_PTR_DELETE(this->parameters)
+    SAFE_DELETE(this->parameters)
+    SAFE_DELETE(this->body)
+
+    for(uint i=0; i<this->prototype.size(); i++)
+        SAFE_DELETE(this->prototype[i])
+}
+
 void FunctionNode::print() {
     std::cout << "function declaration <line: " << line_number
         << ", col: " << col_number

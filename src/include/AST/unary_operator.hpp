@@ -16,6 +16,7 @@ class UnaryOperatorNode : public ASTNodeBase
             int _col_number, 
             enumOperator _op, 
             Node _operand);
+        ~UnaryOperatorNode();
         void accept(ASTVisitorBase &v) {v.visit(this); }
         void print();
 };

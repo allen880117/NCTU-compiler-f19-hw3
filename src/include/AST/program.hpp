@@ -28,7 +28,7 @@ class ProgramNode : public ASTNodeBase
             int _end_line_number, 
             int _end_col_number, 
             string _end_name );
+        ~ProgramNode();
         void accept(ASTVisitorBase &v) {v.visit(this); }
         void print();
-        ~ProgramNode(){};
 };

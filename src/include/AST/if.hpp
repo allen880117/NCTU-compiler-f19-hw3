@@ -18,6 +18,7 @@ class IfNode : public ASTNodeBase
             Node _condition, 
             NodeList* _body, 
             NodeList* _body_of_else);
+        ~IfNode();
         void accept(ASTVisitorBase &v) {v.visit(this); }
         void print();
 };

@@ -16,6 +16,7 @@ class FunctionCallNode : public ASTNodeBase
             int _col_number, 
             string _function_name, 
             NodeList* _arguments);
+        ~FunctionCallNode();
         void accept(ASTVisitorBase &v) {v.visit(this); }
         void print();
 };

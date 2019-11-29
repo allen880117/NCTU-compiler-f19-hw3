@@ -1067,6 +1067,8 @@ int main(int argc, const char *argv[]) {
     if(argc == 3 && isDumpNeed == 0)
         dumpAST(AST);
 
+    // delete AST; // Hierarchy Problem
+
     printf("\n"
            "|--------------------------------|\n"
            "|  There is no syntactic error!  |\n"

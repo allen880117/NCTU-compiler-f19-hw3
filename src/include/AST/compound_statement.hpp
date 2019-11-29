@@ -16,6 +16,7 @@ class CompoundStatementNode : public ASTNodeBase
             int _col_number, 
             NodeList* _declaration_node_list, 
             NodeList* _statement_node_list);
+        ~CompoundStatementNode();
         void accept(ASTVisitorBase &v) {v.visit(this); }
         void print();
 };

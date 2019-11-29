@@ -18,6 +18,7 @@ class BinaryOperatorNode : public ASTNodeBase
             enumOperator _op, 
             Node _left_operand, 
             Node _right_operand);
+        ~BinaryOperatorNode();
         void accept(ASTVisitorBase &v) {v.visit(this); }
         void print();
 };

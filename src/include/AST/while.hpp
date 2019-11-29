@@ -16,6 +16,7 @@ class WhileNode : public ASTNodeBase
             int _col_number, 
             Node _condition, 
             NodeList* _body);
+        ~WhileNode();
         void accept(ASTVisitorBase &v) {v.visit(this); }
         void print();
 };

@@ -4,6 +4,26 @@
 #include <vector>
 #include <string>
 #include "visitor/visitor.hpp"
+
+#define SAFE_DELETE(NODE)       \
+    if((NODE) != nullptr)       \
+    {                           \
+        delete (NODE);          \
+        (NODE) = nullptr;       \
+    }                           \
+
+#define NODELIST_PTR_DELETE(NODELIST_PTR)                       \
+    if((NODELIST_PTR)!=nullptr)                                 \
+    {                                                           \
+        for(uint i=0; i<(NODELIST_PTR)->size(); i++)            \
+        {                                                       \
+            delete (*(NODELIST_PTR))[i];                        \
+            (*(NODELIST_PTR))[i]=nullptr;                       \
+        }                                                       \
+        delete (NODELIST_PTR);                                  \
+        (NODELIST_PTR)=nullptr;                                 \
+    }                                                           \
+
 using namespace std;
 
 typedef vector< class ASTNodeBase* > NodeList;

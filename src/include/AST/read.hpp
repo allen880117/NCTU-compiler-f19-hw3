@@ -14,6 +14,7 @@ class ReadNode : public ASTNodeBase
             int _line_number, 
             int _col_number, 
             Node _variable_reference_node);
+        ~ReadNode();
         void accept(ASTVisitorBase &v) {v.visit(this); }
         void print();
 };

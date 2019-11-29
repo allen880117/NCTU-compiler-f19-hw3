@@ -14,6 +14,7 @@ class ConstantValueNode : public ASTNodeBase
             int _line_number, 
             int _col_number, 
             VariableInfo* _constant_value);
+        ~ConstantValueNode();
         void accept(ASTVisitorBase &v) {v.visit(this); }
         void print();
 };

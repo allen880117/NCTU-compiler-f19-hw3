@@ -20,8 +20,8 @@ class VariableNode : public ASTNodeBase
             string _variable_name, 
             VariableInfo* _type, 
             Node _constant_value_node);
+        ~VariableNode();
         void accept(ASTVisitorBase &v) {v.visit(this); }
         void print();
         string getType();
-        ~VariableNode(){};
 };

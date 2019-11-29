@@ -16,6 +16,7 @@ class AssignmentNode : public ASTNodeBase
             int _col_nubmer, 
             Node _variable_reference_node, 
             Node _expression_node);
+        ~AssignmentNode();
         void accept(ASTVisitorBase &v) {v.visit(this); }
         void print();
 };

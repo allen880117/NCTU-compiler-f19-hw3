@@ -5,13 +5,19 @@
 #include <string>
 
 ConstantValueNode::ConstantValueNode(
-            int _line_number, 
-            int _col_number, 
-            VariableInfo* _constant_value){
-                this->line_number = _line_number;
-                this->col_number = _col_number;
-                this->constant_value = _constant_value;
-            }
+    int _line_number, 
+    int _col_number, 
+    VariableInfo* _constant_value
+    ){
+        this->line_number = _line_number;
+        this->col_number = _col_number;
+        this->constant_value = _constant_value;
+    }
+
+ConstantValueNode::~ConstantValueNode(){
+    SAFE_DELETE(this->constant_value)
+}
+
 void ConstantValueNode::print() {
     std::cout << "constant <line: " << line_number
         << ", col: " << col_number

@@ -14,7 +14,8 @@ ProgramNode::ProgramNode(
     Node _compound_statement_node, 
     int _end_line_number, 
     int _end_col_number, 
-    string _end_name ){
+    string _end_name
+    ){
         this->line_number = _line_number;
         this->col_number = _col_number;
         this->program_name = _program_name;
@@ -26,6 +27,13 @@ ProgramNode::ProgramNode(
         this->end_col_number = _end_col_number;
         this->end_name = _end_name;
     }
+
+ProgramNode::~ProgramNode(){
+    NODELIST_PTR_DELETE(this->declaration_node_list)
+    NODELIST_PTR_DELETE(this->function_node_list)
+    SAFE_DELETE(this->compound_statement_node)
+}
+
 void ProgramNode::print() {    
     std::cout << "program <line: " << line_number
         << ", col: " << col_number

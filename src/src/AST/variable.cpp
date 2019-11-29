@@ -5,19 +5,25 @@
 #include <string>
 
 VariableNode::VariableNode(
-            int _line_number, 
-            int _col_number, 
-            string _variable_name, 
-            VariableInfo* _type, 
-            Node _constant_value_node){
-                this->line_number = _line_number;
-                this->col_number = _col_number;
-                this->variable_name = _variable_name;
-                this->type = _type;
-                this->constant_value_node = _constant_value_node;
-            }
-void VariableNode::print() {
-    
+    int _line_number, 
+    int _col_number, 
+    string _variable_name, 
+    VariableInfo* _type, 
+    Node _constant_value_node
+    ){
+        this->line_number = _line_number;
+        this->col_number = _col_number;
+        this->variable_name = _variable_name;
+        this->type = _type;
+        this->constant_value_node = _constant_value_node;
+    }
+
+VariableNode::~VariableNode(){
+    SAFE_DELETE(this->type)
+    SAFE_DELETE(this->constant_value_node)
+}
+
+void VariableNode::print() {    
     std::cout << "variable <line: " << line_number
         << ", col: " << col_number
         << "> " << variable_name

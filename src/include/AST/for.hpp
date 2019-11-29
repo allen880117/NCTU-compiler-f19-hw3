@@ -20,6 +20,7 @@ class ForNode : public ASTNodeBase
             Node _initial_statement, 
             Node _condition, 
             NodeList* _body);
+        ~ForNode();
         void accept(ASTVisitorBase &v) {v.visit(this); }
         void print();
 };

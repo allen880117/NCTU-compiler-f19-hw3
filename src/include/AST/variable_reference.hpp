@@ -16,6 +16,7 @@ class VariableReferenceNode : public ASTNodeBase
             int _col_number, 
             string _variable_name, 
             NodeList* _expression_node_list);
+        ~VariableReferenceNode();
         void accept(ASTVisitorBase &v) {v.visit(this); }
         void print();
 };
