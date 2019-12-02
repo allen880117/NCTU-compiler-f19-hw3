@@ -2,7 +2,7 @@
 
 **Introduction to Compiler Design by Prof. Yi-Ping You**
 
-Due Date: **23:59, December 4, 2019**
+Due Date: **23:59, December 8, 2019**
 
 In this assignment, you will extend your parser to construct an abstract syntax tree (AST) for a given program written in **`P`** language and to serialize this AST into the designated format.
 
