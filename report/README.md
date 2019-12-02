@@ -4,7 +4,16 @@
 > 學號：0616309
 ___
 ## 功能
+#### 編譯
+* `cd src && make clean && make`
+* 由於本次採用`C++`撰寫，所以必須修改`Makerfile`以支援編譯。
 
+#### 測試
+* `cd test && python3 test.py`
+
+#### 使用Parser 且 Dump AST
+* `cd src && ./parser <file_name.p> --dump-ast`
+___
 ## `Parser.y`的主要修改
 #### 增加更多標頭檔和 AST 的 Root
 * 在 C Declarationh Area 新增所有 Node 的標頭檔。
@@ -39,6 +48,7 @@ ___
     %code requires { #include "include/AST/declaration.hpp" }
     ...
     %code requires { #include "include/visitor/visitor.hpp" }
+    ...
     ```
     
 #### 增加型別描述
@@ -154,7 +164,7 @@ ___
     ;
     ```
 
-* 以此類推，完善整顆AST。
+* 以此類推，完善並建構整個`AST`。
 
 #### 增加 Traverse AST 的選項
 * 增加`--dump-ast`，若添加此參數，則輸出 Inorder Traverse AST 的結果。
@@ -165,13 +175,15 @@ ___
         node->accept(visitor);
     }
     ```
-
+___
 ## `Scanner.l`的主要修改
 #### 增加回傳值
 
+___
+
 ## `AST`的功能
 #### 紀錄程式整體結構
-
+___
 ## `AST`的建構
 * 依照 [Abstract Syntactic Definitions](https://github.com/compiler-f19/hw3-allen880117/blob/master/ast_guideline.md) 實作。
 * 為方便資訊的擷取和建構，定義了某些型別，將在下方介紹。
