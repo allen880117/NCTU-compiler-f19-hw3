@@ -55,6 +55,12 @@ program <line: 4, col: 1> expression void
       binary operator <line: 22, col: 13> or
         constant <line: 22, col: 11> 1
         constant <line: 22, col: 16> 0
+    print statement <line: 23, col: 5>
+      binary operator <line: 23, col: 19> *
+        binary operator <line: 23, col: 14> +
+          constant <line: 23, col: 12> 1
+          constant <line: 23, col: 16> 8
+        constant <line: 23, col: 21> 4
 
 |--------------------------------|
 |  There is no syntactic error!  |

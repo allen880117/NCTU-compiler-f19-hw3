@@ -20,5 +20,6 @@ begin
     print not true;
     print 10 and 0;
     print 1 or 0;
+    print (1 + 8) * 4;
 end
 end expression
