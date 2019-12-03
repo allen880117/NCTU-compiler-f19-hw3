@@ -52,6 +52,17 @@ ___
     ```
     
 #### 增加型別描述
+* 在 C Declaration Area 新增定義 yyltype ，以記錄從 scanner 傳來的位置資訊。
+    ```cpp
+    #define YYLTYPE yyltype
+
+    typedef struct YYLTYPE {
+        uint32_t first_line;
+        uint32_t first_column;
+        uint32_t last_line;
+        uint32_t last_column;
+    } yyltype;
+    ```
 * 在 C Declaration Area 新增一些型別用於`%union`中。
     ```cpp
     %{
@@ -64,7 +75,7 @@ ___
         uint32_t col_number;
     };
     
-    // 用於 FormalArgs 的建立和紀錄回傳
+    // 用於 FormalArgList 的建立和紀錄回傳
     struct NodeWithTypeList{
         Node node;            // 特指 Declaration Node // 下方介紹
         VariableInfo* type;   // 下方介紹
@@ -167,7 +178,7 @@ ___
 * 以此類推，完善並建構整個`AST`。
 
 #### 增加 Traverse AST 的選項
-* 增加`--dump-ast`，若添加此參數，則輸出 Inorder Traverse AST 的結果。
+* 增加`--dump-ast`，若在執行時添加此參數，則輸出 Inorder Traverse AST 的結果。
 
     ```cpp
     void dumpAST(ASTNodeBase* node){
@@ -178,11 +189,82 @@ ___
 ___
 ## `Scanner.l`的主要修改
 #### 增加回傳值
+* 利用 yylval 結構內的變數回傳 token 相應的值。
+* 會使用在 scanner.l 中者為以下顯示的四種。
+```cpp
+%union {
+    int    val;    // 整數值
+    double dval;   // 浮點數值
+    char*  text;   // 字串值
 
+    enum enumOperator op_type; // 專司Operator種類的回傳
+
+    ...
+}
+```
+
+* 以 yylval.op_type 紀錄並利用 enum 回傳 operator 的種類。
+```cpp
+    /* Operator */
+"+"   { TOKEN_CHAR('+'); yylval.op_type=OP_PLUS;            return PLUS;}
+"-"   { TOKEN_CHAR('-'); yylval.op_type=OP_MINUS;           return MINUS;}
+"*"   { TOKEN_CHAR('*'); yylval.op_type=OP_MULTIPLY;        return MULTIPLY;}
+"/"   { TOKEN_CHAR('/'); yylval.op_type=OP_DIVIDE;          return DIVIDE;}
+"mod" { TOKEN(mod);      yylval.op_type=OP_MOD;             return MOD;}
+":="  { TOKEN(:=);       yylval.op_type=OP_ASSIGN;          return ASSIGN;}
+"<"   { TOKEN_CHAR('<'); yylval.op_type=OP_LESS;            return LESS;}
+"<="  { TOKEN(<=);       yylval.op_type=OP_LESS_OR_EQUAL;   return LESS_OR_EQUAL;}
+"<>"  { TOKEN(<>);       yylval.op_type=OP_NOT_EQUAL;       return NOT_EQUAL;}
+">="  { TOKEN(>=);       yylval.op_type=OP_GREATER_OR_EQUAL;return GREATER_OR_EQUAL;}
+">"   { TOKEN_CHAR('>'); yylval.op_type=OP_GREATER;         return GREATER;}
+"="   { TOKEN_CHAR('='); yylval.op_type=OP_EQUAL;           return EQUAL;}
+"and" { TOKEN(and);      yylval.op_type=OP_AND;             return AND;}
+"or"  { TOKEN(or);       yylval.op_type=OP_OR;              return OR;}
+"not" { TOKEN(not);      yylval.op_type=OP_NOT;             return NOT;}
+```
+
+* 以 yylval.text 紀錄 Identifier 的名稱。 
+```cpp
+    /* Identifier */
+[a-zA-Z][a-zA-Z0-9]* { ...; yylval.text = strdup(yytext); return ID; }
+```
+
+* 以 yylval.val 紀錄整數值(全部轉為十進位)。
+```cpp
+    /* Integer (decimal/octal) */
+{integer} { ...; yylval.val = atoi(yytext); return INT_LITERAL; }
+0[0-7]+   { ...; yylval.val = strtol(yytext, NULL, 8); return INT_LITERAL; }
+```
+
+* 以 yylval.dval 紀錄浮點數值(科學記號轉為純浮點數)。
+```cpp
+    /* Floating-Point */
+{float} { ...; yylval.dval = atof(yytext); return REAL_LITERAL; }
+
+    /* Scientific Notation [Ee][+-]?[0-9]+ */
+({integer}|{float})[Ee][+-]?({integer}) {
+    TOKEN_STRING(scientific, yytext);
+    yylval.dval = atof(yytext);
+    return REAL_LITERAL;
+}
+```
+
+* 以 yylval.text 紀錄字串值。
+```cpp
+    /* String */
+\"([^"\n]|\"\")*\" {
+    ...
+    yylval.text = strdup(yytext);
+    return STRING_LITERAL;
+}
+```
 ___
 
 ## `AST`的功能
 #### 紀錄程式整體結構
+
+* 藉由建構AST，我們可以在Parser完成其任務後得到一詳細的程式架構圖。
+* AST可以充分表達程式的結構，在之後建立`Symbol Table`等實作上將會十分有用處。
 ___
 ## `AST`的建構
 * 依照 [Abstract Syntactic Definitions](https://github.com/compiler-f19/hw3-allen880117/blob/master/ast_guideline.md) 實作。
@@ -321,3 +403,67 @@ typedef struct __VariableInfo{
     
 ## `Visitor Pattern` 的建構
 * 當我們建構完 AST 後，我們便可以以某些方式遍歷所有的 Node。
+* 若採用 Vistior Pattern 的設計，程式的呼叫上大致如下流程：
+    1. Node accept Visitor。
+    2. 呼叫 Node 的 Visit-Function (in Visitor)。
+    3. Visit-Function 裡面已經定義好該如何去 "Visit" 這個 Node。
+
+* 而在每一個 Node 中都有繼承自 ASTNodeBase 的 accept() 並對其多載。
+* 同時每一個 Node 中都有各自獨立的 print() 或是其餘函數。
+```cpp
+class ProgramNode : public ASTNodeBase
+{
+    ...
+        void accept(ASTVisitorBase &v) {v.visit(this); }
+        void print();
+};
+```
+
+* 採用多型和虛擬函數的方式，可以大量撰寫各 Node 的 Visit-Function。
+```cpp
+class ASTVisitor : public ASTVisitorBase
+{
+    public:
+        void visit(class ProgramNode *m) override;
+        void visit(class DeclarationNode *m) override;
+        void visit(class VariableNode *m) override;
+        void visit(class ConstantValueNode *m) override;
+        void visit(class FunctionNode *m) override;
+        void visit(class CompoundStatementNode *m) override;
+        void visit(class AssignmentNode *m) override;
+        void visit(class PrintNode *m) override;
+        void visit(class ReadNode *m) override;
+        void visit(class VariableReferenceNode *m) override;
+        void visit(class BinaryOperatorNode *m) override;
+        void visit(class UnaryOperatorNode *m) override;
+        void visit(class IfNode *m) override;
+        void visit(class WhileNode *m) override;
+        void visit(class ForNode *m) override;
+        void visit(class ReturnNode *m) override;
+        void visit(class FunctionCallNode *m) override;
+};
+```
+
+* 而 Visit-Function 大致以如下形式撰寫。
+* 基本上 Node A 是不會直接呼叫 Node B 的 print()。
+* 因為每個 Node 都有在Traverse上都有不同的細節需要注意。  
+```cpp
+void ASTVisitor::visit(ProgramNode *m) {
+    this->print_space();
+        m->print();
+    
+    this->space_counter_increase();
+        if (m->declaration_node_list != nullptr)
+            for(uint i=0; i< m->declaration_node_list->size(); i++){
+                (*(m->declaration_node_list))[i]->accept(*this);
+            }
+
+        if (m->function_node_list != nullptr)
+            for(uint i=0; i< m->function_node_list->size(); i++){
+                (*(m->function_node_list))[i]->accept(*this);
+            }
+
+        if (m->compound_statement_node != nullptr)
+            m->compound_statement_node->accept(*this);
+    this->space_counter_decrease();
+}
