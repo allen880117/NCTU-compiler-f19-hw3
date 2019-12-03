@@ -50,6 +50,8 @@ extern char *yytext;
 extern int yylex(void);
 static void yyerror(const char *msg);
 
+extern int yylex_destroy(void); // Memory_Free
+
 /* Datatype for Return Non-terminals */
 struct id_info{
     string name;
@@ -1165,8 +1167,9 @@ int main(int argc, const char *argv[]) {
 
     // Memory_Free
     delete AST;
-    free(yytext);
+    //free(yytext);
     fclose(fp);
+    yylex_destroy();
     // Memory_Free_END
 
     printf("\n"
