@@ -9,7 +9,7 @@ void ASTVisitor::visit(FunctionNode *m) {
     this->space_counter_increase();
         if (m->parameters != nullptr)
             for(uint i=0; i< m->parameters->size(); i++){
-                (*(m->parameters))[i]->accept(*this);
+                (*(m->parameters))[i]->node->accept(*this);
             }
         
         if (m->body != nullptr)

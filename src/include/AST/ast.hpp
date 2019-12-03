@@ -85,6 +85,12 @@ typedef struct __VariableInfo{
     BooleanLiteral boolean_literal;
 } VariableInfo ;
 
+struct NodeWithTypeList{
+    Node node;
+    VariableInfo* type;
+    uint counter;
+};
+
 class ASTNodeBase
 {
     public:
