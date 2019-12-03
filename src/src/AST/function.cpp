@@ -8,7 +8,7 @@ FunctionNode::FunctionNode(
     int _line_number, 
     int _col_number, 
     string _function_name, 
-    NodeList* _parameters, 
+    vector<NodeWithTypeList*>* _parameters, 
     VariableInfo* _return_type, 
     Node _body, 
     int _end_line_number, 
@@ -28,8 +28,19 @@ FunctionNode::FunctionNode(
     }
 
 FunctionNode::~FunctionNode(){
-    NODELIST_PTR_DELETE(this->parameters)
-    SAFE_DELETE(this->parameters)
+    if(this->parameters != nullptr){
+        for(uint i=0; i<this->parameters->size(); i++){
+            if((*(this->parameters))[i]->node != nullptr)
+                delete (*(this->parameters))[i]->node;
+            if((*(this->parameters))[i]->type != nullptr)
+                delete (*(this->parameters))[i]->type;
+            
+            delete (*(this->parameters))[i];
+        }
+        delete this->parameters;
+    }
+    
+    SAFE_DELETE(this->return_type)
     SAFE_DELETE(this->body)
 
     for(uint i=0; i<this->prototype.size(); i++)

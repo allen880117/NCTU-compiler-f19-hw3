@@ -57,16 +57,6 @@ struct id_info{
     uint32_t col_number;
 };
 
-struct NodeWithTypeList{
-    Node node;
-    VariableInfo* type;
-    uint counter;
-    ~NodeWithTypeList(){
-        if(type != nullptr)
-        delete type;
-    }
-};
-
 static Node AST;
 
 %}
@@ -283,13 +273,13 @@ FunctionDeclaration:
     END FunctionName {
         // Function Node
         vector<VariableInfo*> prototype;
-        NodeList* parameters = new NodeList();
+        //NodeList* parameters = new NodeList();
         
         // Disassemble FormalArgList (node w type list ptr list ptr)
         if ($3!=nullptr)
             for(uint i=0; i<$3->size(); i++){
                 // put node (Node)
-                parameters->push_back((*$3)[i]->node);
+                //parameters->push_back((*$3)[i]->node);
                 for(uint j=0; j<(*$3)[i]->counter; j++){
                     // put type (VariableInfo*)
                     // duplicate (eliminate hierarchy problem)
@@ -306,15 +296,15 @@ FunctionDeclaration:
                 }   
             }
         else {
-            delete parameters;
-            parameters = nullptr;
+            //delete parameters;
+            //parameters = nullptr;
         }
 
         $$ = new FunctionNode(
             @1.first_line,
             @1.first_column,
             string($1),
-            parameters,
+            $3,
             $5,
             $7,
             @9.first_line,
@@ -326,14 +316,6 @@ FunctionDeclaration:
         // Memory_Free
         free($1);
         free($9);
-
-        if ($3 != nullptr){
-            for(uint i=0; i<$3->size(); i++)
-            if((*$3)[i] != nullptr)
-                delete (*$3)[i];
-        
-            delete $3;
-        }
     }
 ;
 
@@ -416,7 +398,7 @@ IdList:
         $$->push_back(id_info{string($1), @1.first_line, @1.first_column});
 
         // Memory_Free
-        delete $1;
+        free($1);
     }
     |
     IdList COMMA ID{
@@ -424,7 +406,7 @@ IdList:
         $$ = $1;
 
         // Memory_Free
-        delete $3;
+        free($3);
     }
 ;
 
@@ -467,11 +449,21 @@ Declaration:
                     dupTemp
                 );
 
+                // duplicate $4 (eliminate hierarchy problem)
+                VariableInfo* dupTemp2 = new VariableInfo();
+                dupTemp2->type_set = $4->type_set;
+                dupTemp2->type = $4->type;
+                dupTemp2->array_range = $4->array_range;
+                dupTemp2->int_literal = $4->int_literal;
+                dupTemp2->real_literal = $4->real_literal;
+                dupTemp2->string_literal = $4->string_literal;
+                dupTemp2->boolean_literal = $4->boolean_literal;
+
                 VariableNode* variable_node = new VariableNode(
                     (*$2)[i].line_number,
                     (*$2)[i].col_number,
                     (*$2)[i].name,
-                    $4,
+                    dupTemp2,
                     constant_value_node
                 );
 
@@ -479,11 +471,21 @@ Declaration:
                 
             } else { 
                 // Type
+                // duplicate $4 (eliminate hierarchy problem)
+                VariableInfo* dupTemp = new VariableInfo();
+                dupTemp->type_set = $4->type_set;
+                dupTemp->type = $4->type;
+                dupTemp->array_range = $4->array_range;
+                dupTemp->int_literal = $4->int_literal;
+                dupTemp->real_literal = $4->real_literal;
+                dupTemp->string_literal = $4->string_literal;
+                dupTemp->boolean_literal = $4->boolean_literal;
+
                 VariableNode* variable_node = new VariableNode(
                     (*$2)[i].line_number,
                     (*$2)[i].col_number,
                     (*$2)[i].name,
-                    $4,
+                    dupTemp,
                     nullptr
                 );
 
@@ -499,6 +501,7 @@ Declaration:
 
         // Memory_Free
         delete $2;
+        delete $4;
     }
 ;
 
@@ -554,6 +557,10 @@ ArrType:
         $$->type_set = SET_ACCUMLATED;
         $$->type = $2->type;
         $$->array_range = $1->array_range;
+
+        // Memory_Free
+        delete $1;
+        delete $2;
     }
 ;
 
@@ -1156,7 +1163,11 @@ int main(int argc, const char *argv[]) {
     if(argc == 3 && isDumpNeed == 0)
         dumpAST(AST);
 
-    delete AST; // Hierarchy Problem
+    // Memory_Free
+    delete AST;
+    free(yytext);
+    fclose(fp);
+    // Memory_Free_END
 
     printf("\n"
            "|--------------------------------|\n"
