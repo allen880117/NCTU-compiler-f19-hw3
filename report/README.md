@@ -74,15 +74,6 @@ ___
         uint32_t line_number;
         uint32_t col_number;
     };
-    
-    // 用於 FormalArgList 的建立和紀錄回傳
-    struct NodeWithTypeList{
-        Node node;            // 特指 Declaration Node // 下方介紹
-        VariableInfo* type;   // 下方介紹
-        uint counter;         // 紀錄有多少個 Id 為此型別的參數
-    };
-    ...
-    %}
     ```
     
 * 在 Declaration Area 新增 `%union` 以增加 scanner (`yylval`)的可回傳型別 
@@ -331,7 +322,18 @@ vector< class ASTNodeBase* >*
     };
     ```
     declaration_node_list 就是以 NodeList* 型別紀錄於 ProgramNode 中。
-    
+#### NodeWithTypeList 和 vector<NodeWithTypeList*>*
+```cpp
+    struct NodeWithTypeList{
+        Node node;            // 特指 Declaration Node // 下方介紹
+        VariableInfo* type;   // 下方介紹
+        uint counter;         // 紀錄有多少個 Id 為此型別的參數
+    };
+    ...
+    %}
+```
+* 用於 FormalArgList 的建立和紀錄回傳
+
 #### VariableInfo
 ```cpp
 typedef struct __VariableInfo{ 
@@ -359,8 +361,8 @@ typedef struct __VariableInfo{
           UNKNOWN_SET
       };
       ```
-    此變數或常數的型別群。
-    有`SCALAR`、`ACCUMLATED`、`CONSTANT`、`UNKNOWN`等。
+    `enumTypeSet` 負責此變數或常數的型別群。
+    有`SCALAR`、`ACCUMLATED`、`CONSTANT_LITERAL`、`UNKNOWN`等。
     
     * ```cpp
       enum enumType{
@@ -372,7 +374,7 @@ typedef struct __VariableInfo{
           UNKNOWN_TYPE
       };
       ```
-    此變數或常數的(單位元素)型別。
+    `enumType` 負責枚舉此變數或常數的(單位元素)型別。
     有`INTEGER`、`REAL`、`STRING`、`BOOLEAN`、`VOID`、`UNKNOWN`等。
     
     * ```cpp
@@ -380,9 +382,10 @@ typedef struct __VariableInfo{
           int start;
           int end;
       } IntPair;
+
       vector<IntPair> array_range;
       ```
-    負責紀錄一維或多維陣列的範圍。
+    `vector<IntPair>` 負責紀錄一維或多維陣列的範圍。
     
     * ```cpp
       int int_literal;
@@ -390,7 +393,7 @@ typedef struct __VariableInfo{
       string string_literal;
       BooleanLiteral boolean_literal;
       ```
-    負責紀錄四種常數的值。
+    以上負責紀錄四種常數的值。
 
 * 在建構 AST Node 時，此型別的資訊通常會依照以下流程轉換：
     1. 根據 enumTypeSet 判斷其隸屬群為純量、陣列、常數、不明等。
@@ -467,3 +470,38 @@ void ASTVisitor::visit(ProgramNode *m) {
             m->compound_statement_node->accept(*this);
     this->space_counter_decrease();
 }
+```
+
+## [BONUS] HW3 Spec 可以改進的地方
+### 前言
+* 先說一聲辛苦助教們了。
+* 我是覺得這次的 Spec 其實完成度已經很高了。
+    ```
+    真的很高!
+    你各位知道有個漂亮的Spec是多麼幸福的一件事嗎!
+    我看到每一個 Node 都有明確定義的時候真的是嗨到不行!
+    ```
+* **`所以接下來這個部分有點像是雞蛋裡挑骨頭，還請見諒。`**
+
+### BUG & Spec 的細節疑問
+* 這是我之前找到的[Bug](https://github.com/compiler-f19/Discussion/issues/55)，已經發在Discussion裡面且被標上`Solved`了。
+* 這我不確定是不是[Bug](https://github.com/compiler-f19/Discussion/issues/53)，應該比較像是 Spec 在說明上稍微不清楚，同樣已經發在Discussion裡面且被標上`Solved`了。
+
+### 可能可以改進的細節
+* 這是以我自己實作的經驗回推的。
+* 我基本上是 Spec 和 yacc 講義全部看個兩、三遍，就開始做了。
+* 遇上問題就靠 Console 噴的訊息和 Google 去 Debug。
+* 有實作細節上的疑問才會上 Discussion 發 Issue。
+* 而剛開始做的時候其實會有一些不確定的地方，以下就一一寫出來。
+
+#### 1. 該用純`C`還是混`C++`
+* Repository 最初的檔案是以 `C` 的語法撰寫。
+* 但由於 Spec 裡面有說比較推薦使用 `C++` ，且尚須實作`Visitor Pattern`，而`VP`的解說是以`C++`為範例說明，所以可能會在使用純`C` 還是混`C++`間猶豫。
+* 我有發一個 [Issue](https://github.com/compiler-f19/Discussion/issues/52) 來確認想法後才開始實作。
+
+#### 2. 在 yacc/bison 使用 `C++`
+* 主要的問題是能在 `%union` 中放置的型別。
+* 由於 `yacc` 的講義中只解說了 `C` 的部分，所以 `C++` 的使用上要稍微摸索一下。
+* 參考[這份資料](https://www.gnu.org/software/bison/manual/html_node/C_002b_002b-Unions.html)，我們可以知道非 [`POD (Plain Old Data)`](https://zh.wikipedia.org/wiki/POD_(%E7%A8%8B%E5%BA%8F%E8%AE%BE%E8%AE%A1)) 的型別是不能使用在 `%union` 中的。
+
+### 感謝助教的SPEC那超高的完成度，辛苦了。
