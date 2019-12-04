@@ -27,7 +27,7 @@ void ConstantValueNode::print() {
     switch(this->constant_value->type){
         case TYPE_INTEGER: std::cout << this->constant_value->int_literal; break;
         case TYPE_REAL:    std::cout << fixed << setprecision(6) << this->constant_value->real_literal; break;
-        case TYPE_STRING:  std::cout << fixed << setprecision(6) << this->constant_value->string_literal; break;
+        case TYPE_STRING:  std::cout << this->constant_value->string_literal; break;
         case TYPE_BOOLEAN:
             switch(this->constant_value->boolean_literal){
                 case Boolean_TRUE:  std::cout << "true"; break;
