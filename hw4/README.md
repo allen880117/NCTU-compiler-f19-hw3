@@ -2,7 +2,7 @@
 
 **Introduction to Compiler Design by Prof. Yi-Ping You**
 
-Due Date: TBD
+Due Date: **23:59, December 27, 2019**
 
 Your assignment is to perform semantic analyses for a `P` program. In the previous project, you have constructed an abstract syntax tree (AST). In this assignment, you will do some simple checking of semantic correctness. Code generation will be performed in the last phase of the project.
 
@@ -13,11 +13,12 @@ Your assignment is to perform semantic analyses for a `P` program. In the previo
 	- [Symbol Table](#symbol-table)
 	- [Semantic Definition](#semantic-definition)
 	- [What Should Your Parser Do?](#what-should-your-parser-do)
+	- [Project Structure](#project-structure)
 	- [Submitting the Assignment](#submitting-the-assignment)
 
 ## Assignment
 
-You first need to construct your symbol table, which should be able to perform the following tasks:
+You first need to construct your symbol table when your parser visits a node related to adding a new scope. More specifically, the parser should be able to perform the following tasks:
 
 - Push a symbol table when entering a scope and pop it when exiting the scope.
 - Insert entries for (constant) variables, functions, and program declarations.
@@ -25,7 +26,7 @@ You first need to construct your symbol table, which should be able to perform t
 
 After that, you need to perform semantic analyses with the help of symbol tables by performing post-order traversal on the AST, following the semantic definitions described below.
 
-In summary, you need to implement both of the aforementioned features (construction of symbol tables and semantic analyses) based on the AST you constructed in the previous assignment.
+In summary, you need to implement the construction of symbol tables and semantic analyses based on the AST you constructed in the previous assignment by traversing the AST in preorder and postorder, respectively.
 
 ## Pseudocomments
 
@@ -133,7 +134,7 @@ After parsing the definition of function `func` (at line 13), you should output 
 Name                             Kind       Level      Type             Attribute
 --------------------------------------------------------------------------------------------------------------
 a                                parameter  1(local)   integer
-b                                parameter  1(local)   real [2][3]
+b                                parameter  1(local)   real [1][2]
 c                                constant   1(local)   string           "hello world!"
 --------------------------------------------------------------------------------------------------------------
 ```
@@ -165,13 +166,17 @@ After parsing the program's definition (at line 21), you should output the symbo
 Name                             Kind       Level      Type             Attribute
 --------------------------------------------------------------------------------------------------------------
 test                             program    0(global)  void
-func                             function   0(global)  boolean          integer, real [2][3]
+func                             function   0(global)  boolean          integer, real [1][2]
 --------------------------------------------------------------------------------------------------------------
 ```
+
+#### Note that your parser should dump the symbol table to `stdout`.
 
 ## Semantic Definition
 
 This section describes only the semantic definitions. When your parser encounters a semantic error, the parser should report an error with relevant error messages and format, which are described in [error-message.md](./error-message.md).
+
+Note that **once your parser has found a semantic error in a child node of an AST node, the parser doesn't check semantic errors related to the child node of the AST node.**
 
 ### Program Unit
 
@@ -203,9 +208,11 @@ The two program units are the *program* and the *function*.
 
 ### Variable Declaration and Reference
 
-- In an array declaration, the index of the lower bound must be smaller than that of the upper bound. Both of the indices must be greater than or equal to zero.
+- In an array declaration, the index of the lower bound must be smaller than that of the upper bound. Both of the indices must be greater than or equal to zero; actually, a non-conforming input was already blocked according to the syntactic definition.
 
-- Each index of array references must be an integer. Bound checking is not performed at compile time as in C language.
+- If there is an error in the array declaration, further checking is unnecessary when visiting the Variable Reference Node which is a reference to that array.
+
+- Each index of an array reference must be of the integer type. Further checking regarding the array reference is unnecessary if an incorrect index was found within the array reference. The order of index checking is from left to right. Bound checking is not performed at compile time as in C language.
 
 - An over array subscript is not allowed, that is, the number of indices of an array reference cannot be greater than the number of dimensions in the declaration.
 
@@ -231,7 +238,7 @@ The two program units are the *program* and the *function*.
 
 ### Statement
 
-There are 7 distinct kinds of statements: compound, simple, conditional, while, for, return, and procedure call.
+There are 7 distinct kinds of statements: compound, simple, conditional, while, for, return, and function call.
 
 #### Simple
 
@@ -251,13 +258,19 @@ There are 7 distinct kinds of statements: compound, simple, conditional, while, 
 
 - In a loop scope, the loop variable must be different from any other variable declaration including the nested loop variable.
 
-- The **loop parameters** used to compute an iteration count must be in the incremental order and greater than or equal to zero.
+- The **loop parameters** used to compute an iteration count must be in the incremental order and greater than or equal to zero; actually, a non-conforming form of the latter rule was already blocked according to the syntactic definition.
+
+#### Return
+
+- Check the definitions about return value in Sections [Program](#program) and [Function](#function).
 
 #### Function Call
 
 - A procedure is a function that has no return value.
 
-- The types of the actual parameters must be identical to the types of the formal parameters in the function declaration.
+- The number of actual parameters must be the same as the number of formal parameters in the function declaration.
+
+- The types of actual parameters must be identical to the types of formal parameters in the function declaration.
 
 ### Identifier
 
@@ -276,6 +289,32 @@ If the input file is syntactically and semantically correct, output the followin
 Once the parser encounters a semantic error, output the related error message.
 
 Notice that semantic errors should **not** cause the parser to stop its execution. You should let the parser keep working on finding semantic errors as much as possible.
+
+## Project Structure
+
+- `README.md`
+- /src
+	- Makefile
+	- `scanner.l`
+	- `parser.y`
+	- /include
+		- /AST
+		- /semantic
+		- /visitor
+	- /src
+		- /AST
+		- /semantic
+		- /visitor
+	- Other modules you may add
+- /report
+	- `README.md`
+
+In this assignment, you have to do the following tasks:
+
+- Revise `parser.y` and add some modules (e.g., `SymbolTable.[hc]`, `SemanticAnalyzer.[hc]`) to perform a semantic analysis.
+- Write a report in `report/README.md`. The report should at least describe the changes you have made in `parser.y` and the abilities of your AST.
+
+If you want to preview your report in GitHub style markdown before pushing to GitHub, [`grip`](https://github.com/joeyespo/grip) might be the tool you need.
 
 ## Submitting the Assignment
 
