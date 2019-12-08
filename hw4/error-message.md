@@ -35,14 +35,14 @@ The format of a semantic error:
 
 ## Error Detection
 
-The following describes what semantics should be checked in each node of the AST or symbol table and the corresponding error message.
+The following subsections describe what semantics should be checked for each AST node or the symbol table and the corresponding error messages. Each check inside a node should be performed in the order as described.
 
 ### Symbol Table
 
 - Symbol redeclared.
 
 	```
-	<Error> Found in line x, column y: symbol '<id>' is redeclared
+	<Error> Found in line x, column y: symbol 'a' is redeclared
 	    var a;
 	        ^
 	```
@@ -77,15 +77,11 @@ The following describes what semantics should be checked in each node of the AST
 
 ### Variable Node
 
-- In an array declaration, the index of the lower bound must be smaller than that of the upper bound. Both of the indices must be greater than or equal to zero.
+- In an array declaration, the index of the lower bound must be smaller than that of the upper bound. Both of the indices must be greater than or equal to zero; actually, a non-conforming input was already blocked according to the syntactic definition.
 
 	```
-	<Error> Found in line x, column y: '<id>' declared as an array with a lower bound greater or equal to upper bound
+	<Error> Found in line x, column y: 'arr' declared as an array with a lower bound greater or equal to upper bound
 	    var arr: array 55146 to 80 of integer;
-	        ^
-
-	<Error> Found in line x, column y: '<id>' declared as an array with a lower/upper bound which is negative
-	    var arr: array -1 to 10 of integer
 	        ^
 	```
 
@@ -94,7 +90,7 @@ The following describes what semantics should be checked in each node of the AST
 - Identifier should be in the symbol table.
 
 	```
-	<Error> Found in line x, column y: use of undeclared identifier '<id>'
+	<Error> Found in line x, column y: use of undeclared identifier 'a'
 	    read a;
 	         ^
 	```
@@ -120,7 +116,7 @@ The following describes what semantics should be checked in each node of the AST
 - Errors related to binary operation. (check out [Expression](./README.md#expression))
 
 	```
-	<Error> Found in line x, column y: invalid operands to binary operation '<op>' ('<left operand type>' and '<right operand type>')
+	<Error> Found in line x, column y: invalid operands to binary operation '+' ('string' and 'integer')
 	    a := b + c;
 	           ^
 	```
@@ -130,7 +126,7 @@ The following describes what semantics should be checked in each node of the AST
 - Errors related to unary operation. (check out [Expression](./README.md#expression))
 
 	```
-	<Error> Found in line x, column y: invalid operand to unary operation '<op>' ('<type_of_operand>')
+	<Error> Found in line x, column y: invalid operand to unary operation 'not' ('string')
 	    a := not "SSLAB";
 	         ^
 	```
@@ -140,15 +136,15 @@ The following describes what semantics should be checked in each node of the AST
 - The program and procedure should not have return value.
 
 	```
-	<Error> Found in line x, column y: program/procedure '<id>' should not return a value
+	<Error> Found in line x, column y: program/procedure should not return a value
 	    return 10;
 	    ^
 	```
 
-- The type of the return statement inside the function must be the same as the return type of the function declaration.
+- The type of the return value inside the function must be the same as the return type of the function declaration.
 
 	```
-	<Error> Found in line x, column y: return '<wrong type>' from a function with return type '<type>'
+	<Error> Found in line x, column y: return 'string' from a function with return type 'real'
 	    return "SSLAB";
 	           ^
 	```
@@ -158,29 +154,9 @@ The following describes what semantics should be checked in each node of the AST
 - Constant variable can not be assigned.
 
 	```
-	<Error> Found in line x, column y: cannot assign to variable '<id>' which is a constant
+	<Error> Found in line x, column y: cannot assign to variable 'a' which is a constant
 	    a := 10;
 	    ^
-	```
-
-- Array assignment is not allowed. (**prior to the type consistency check**)
-
-	```
-	<Error> Found in line x, column y: array assignment is not allowed.
-	    arr1 := a2;
-	    ^
-
-	<Error> Found in line x, column y: array assignment is not allowed.
-	    a1 := arr2;
-	          ^
-	```
-
-- In assignment statements, the type of the left-hand side must be the same as that of the right-hand side unless type coercion is permitted.
-
-	```
-	<Error> Found in line x, column y: assigning to '<left type>' from incompatible type '<right type>'
-	    int := string;
-	           ^
 	```
 
 - The value of the loop variable cannot be changed inside the loop.
@@ -188,7 +164,27 @@ The following describes what semantics should be checked in each node of the AST
 	```
 	<Error> Found in line x, column y: the value of loop variable cannot be modified inside the loop
 	    i := 10;
-	      ^
+	    ^
+	```
+
+- Array assignment is not allowed. (**prior to the type consistency check**)
+
+	```
+	<Error> Found in line x, column y: array assignment is not allowed
+	    arr1 := a2;
+	    ^
+
+	<Error> Found in line x, column y: array assignment is not allowed
+	    a1 := arr2;
+	          ^
+	```
+
+- In assignment statements, the type of the left-hand side must be the same as that of the right-hand side unless type coercion is permitted.
+
+	```
+	<Error> Found in line x, column y: assigning to 'int' from incompatible type 'string'
+	    int := stringgg;
+	           ^
 	```
 
 ### Print Node
@@ -196,25 +192,17 @@ The following describes what semantics should be checked in each node of the AST
 - Variable reference in the print statement must be scalar type.
 
 	```
-	<Error> Found in line x, column y: variable reference of print statements must be scalar type
+	<Error> Found in line x, column y: variable reference of print statement must be scalar type
 	    print a[1];
 	          ^
 	```
 
 ### Read Node
 
-- Variable reference in the read statement must be scalar type.
-
-	```
-	<Error> Found in line x, column y: variable reference of read statements must be scalar type
-	    read a[1];
-	         ^
-	```
-
 - Variable reference in the read statement cannot be a constant variable reference.
 
 	```
-	<Error> Found in line x, column y: variable reference of read statements cannot be a constant variable reference.
+	<Error> Found in line x, column y: variable reference of read statement cannot be a constant variable reference
 	    read c;
 	         ^
 	```
@@ -227,6 +215,14 @@ The following describes what semantics should be checked in each node of the AST
 	         ^
 	```
 
+- Variable reference in the read statement must be scalar type.
+
+	```
+	<Error> Found in line x, column y: variable reference of read statement must be scalar type
+	    read a[1];
+	         ^
+	```
+
 ### If Node and While Node
 
 - The conditional expression part of if and while statements must be Boolean type.
@@ -234,7 +230,7 @@ The following describes what semantics should be checked in each node of the AST
 	```
 	<Error> Found in line x, column y: the expression of condition must be boolean type
 	    if a + 10 then
-	       ^
+	         ^
 	```
 
 ### For Node
@@ -242,9 +238,6 @@ The following describes what semantics should be checked in each node of the AST
 - The loop parameters used to compute an iteration count must be in the incremental order and greater than or equal to zero.
 
 	```
-	<Error> Found in line x, column y: the lower/upper bound of iteration count must be greater than or equal to zero
-	    for idx := -1 to 10 do
-	    ^
 	<Error> Found in line x, column y: the lower bound of iteration count must be smaller than or equal to the upper bound
 	    for idx := 10 to 1 do
 	    ^
@@ -252,12 +245,12 @@ The following describes what semantics should be checked in each node of the AST
 
 ### Function Call Node
 
-- The types of the actual parameters must be identical to the types of the formal parameters in the function declaration.
+- Identifier should be in the symbol table.
 
 	```
-	<Error> Found in line x, column y: incompatible types passing '<type of argument>' to parameter of type '<type of parameter>'
+	<Error> Found in line x, column y: used of undeclared function 'func1'
 	    func1(10);
-	          ^
+	    ^
 	```
 
 - The number of the actual parameters must be identical to the number of the formal parameters in the function declaration.
@@ -266,4 +259,12 @@ The following describes what semantics should be checked in each node of the AST
 	<Error> Found in line x, column y: too few/much arguments to function invocation
 	    func1();
 	    ^
+	```
+
+- The types of the actual parameters must be identical to the types of the formal parameters in the function declaration.
+
+	```
+	<Error> Found in line x, column y: incompatible types passing 'integer' to parameter of type 'boolean'
+	    func1(10);
+	          ^
 	```
